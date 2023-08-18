@@ -1,6 +1,8 @@
 #ifndef _HEX_DATA_LOG_FILE_PROTOCAL_H_
 #define _HEX_DATA_LOG_FILE_PROTOCAL_H_
 
+#include "datatype_basic.h"
+
 // The log file 'log.hexlog' is combined with header, packages_name and packages_content.
 
 /* Header */
@@ -45,7 +47,9 @@ for each package:
 
 */
 
-class enum ItemType : unsigned char {
+using namespace SLAM_UTILITY;
+
+enum class ItemType : uint8_t {
 	kUint8 = 0,
     kInt8 = 1,
     kUint16 = 2,
