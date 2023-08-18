@@ -1,0 +1,4 @@
+#ifndef _HEX_DATA_LOG_FILE_PROTOCAL_H_
+#define _HEX_DATA_LOG_FILE_PROTOCAL_H_
+
+#endif // end of _HEX_DATA_LOG_FILE_PROTOCAL_H_
