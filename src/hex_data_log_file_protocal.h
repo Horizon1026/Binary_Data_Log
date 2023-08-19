@@ -10,7 +10,9 @@
 
 /* Packages' name */
 /*
-[0] - [3]: Offset index to the beginning of 'packages_content'
+[0] - [3]: Offset index to the beginning of 'packages_content',
+	which means the whole length of all 'packages_name',
+    and including the checking type.
 
 for each package:
 	[0] - [3]: Offset index to the next 'packages_name',
@@ -37,8 +39,25 @@ for each package:
     	which means the length of this 'package_content',
         and including the checking byte.
 	[4] - [5]: Package id.
-    [6] - [9]: Timestamp of this package content.
+    [6] - [9]: System timestamp of this package content.
+    [10] - [n]: Hex data.
+    [n + 1]: Sum check byte of this package.
 
 */
+
+class enum ItemType : unsigned char {
+	kUint8 = 0,
+    kInt8 = 1,
+    kUint16 = 2,
+    kInt16 = 3,
+    kUint32 = 4,
+    kInt32 = 5,
+    kUint64 = 6,
+    kInt64 = 7,
+    kFloat = 8,
+    kDouble = 9,
+    kImageU8C1 = 10,
+    kImageU8C3 = 11,
+};
 
 #endif // end of _HEX_DATA_LOG_FILE_PROTOCAL_H_
