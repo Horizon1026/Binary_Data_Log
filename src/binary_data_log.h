@@ -7,6 +7,8 @@
 #include "fstream"
 #include "memory"
 #include "string"
+#include "vector"
+#include "unordered_map"
 
 namespace SLAM_DATA {
 
@@ -19,11 +21,13 @@ public:
 
     bool CreateLogFile(const std::string &log_file_name = "data.binlog");
 
-    bool RegisterPackage();
+    bool RegisterPackage(std::unique_ptr<Package> &new_package);
+
+    void ReportAllRegisteredPackages();
 
 private:
     std::unique_ptr<std::fstream> file_ptr_ = nullptr;
-
+    std::unordered_map<uint16_t, std::unique_ptr<Package>> packages_;
 };
 
 }

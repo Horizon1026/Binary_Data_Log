@@ -2,6 +2,8 @@
 #define _BINARY_DATA_LOG_FILE_PROTOCAL_H_
 
 #include "datatype_basic.h"
+#include "string"
+#include "vector"
 
 // The log file 'log.binlog' is combined with header, packages_name and packages_content.
 
@@ -10,7 +12,7 @@
 [0]: Offset index to the beginning of 'packages_name'
     which means the whole length of 'header',
     but has no checking type.
-[1] - [n]: 'HorizonBinaryDataLog', which is fixed texts.
+[1] - [n]: 'BinaryDataLog', which is fixed texts.
 */
 
 /* Packages' name */
@@ -65,6 +67,32 @@ enum class ItemType : uint8_t {
     kDouble = 9,
     kImageU8C1 = 10,
     kImageU8C3 = 11,
+};
+
+static std::vector<std::string> item_type_strings = {
+	"kUint8",
+    "kInt8",
+    "kUint16",
+    "kInt16",
+    "kUint32",
+    "kInt32",
+    "kUint64",
+    "kInt64",
+    "kFloat",
+    "kDouble",
+    "kImageU8C1",
+    "kImageU8C3",
+};
+
+struct PackageItem {
+    ItemType type = ItemType::kUint32;
+    std::string name;
+};
+
+struct Package {
+    uint16_t id = 0;
+    std::string name;
+    std::vector<PackageItem> items;
 };
 
 #endif // end of _BINARY_DATA_LOG_FILE_PROTOCAL_H_
