@@ -1,13 +1,16 @@
-#ifndef _HEX_DATA_LOG_FILE_PROTOCAL_H_
-#define _HEX_DATA_LOG_FILE_PROTOCAL_H_
+#ifndef _BINARY_DATA_LOG_FILE_PROTOCAL_H_
+#define _BINARY_DATA_LOG_FILE_PROTOCAL_H_
 
 #include "datatype_basic.h"
 
-// The log file 'log.hexlog' is combined with header, packages_name and packages_content.
+// The log file 'log.binlog' is combined with header, packages_name and packages_content.
 
 /* Header */
 /*
-[0] - [16]: 'HorizonHexDataLog', which is fixed texts.
+[0]: Offset index to the beginning of 'packages_name'
+    which means the whole length of 'header',
+    but has no checking type.
+[1] - [n]: 'HorizonBinaryDataLog', which is fixed texts.
 */
 
 /* Packages' name */
@@ -64,4 +67,4 @@ enum class ItemType : uint8_t {
     kImageU8C3 = 11,
 };
 
-#endif // end of _HEX_DATA_LOG_FILE_PROTOCAL_H_
+#endif // end of _BINARY_DATA_LOG_FILE_PROTOCAL_H_

@@ -1,4 +1,4 @@
-#include "hex_data_log.h"
+#include "binary_data_log.h"
 #include "log_report.h"
 
 int main(int argc, char **argv) {
