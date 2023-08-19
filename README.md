@@ -1,2 +1,2 @@
-# Hex_Data_Log
-A general hex data log codec.
+# Binary_Data_Log
+A general binary data log codec.
