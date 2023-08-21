@@ -64,7 +64,7 @@ void BinaryDataLog::ReportAllRegisteredPackages() {
 }
 
 void BinaryDataLog::WriteLogFileHeader() {
-    const uint32_t header_offset = binary_log_file_header.size() + 1;
+    const uint32_t header_offset = binary_log_file_header.size() + 4;
     file_ptr_->write(reinterpret_cast<const char *>(&header_offset), 4);
     file_ptr_->write(binary_log_file_header.c_str(), binary_log_file_header.size());
 }

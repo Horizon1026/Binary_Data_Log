@@ -18,19 +18,19 @@
 /* Part 2: Packages' name */
 /*
 [0] - [3]: Offset index to the beginning of 'packages_content',
-	which means the whole length of all 'packages_name',
+    which means the whole length of all 'packages_name',
     and including the checking type.
 
 for each package:
-	[0] - [3]: Offset index to the next 'packages_name',
-    	which means the length of this 'packages_name',
+    [0] - [3]: Offset index to the next 'packages_name',
+        which means the length of this 'packages_name',
         and including the checking byte.
     [4] - [5]: Package id.
-	[6]: Length of text name of this package.
+    [6]: Length of text name of this package.
     [7] - [n]: Text name of this package.
 
     for each item in package:
-    	[0]: Type of item. Which is enmu of 'uint8_t', 'float', 'double' and so on.
+        [0]: Type of item. Which is enmu of 'uint8_t', 'float', 'double' and so on.
         [1]: Length of text name of this item.
         [2] - [n]: Text name of this item.
 
@@ -42,10 +42,10 @@ for each package:
 /*
 
 for each package:
-	[0] - [3]: Offset index to the next 'package_content',
-    	which means the length of this 'package_content',
+    [0] - [3]: Offset index to the next 'package_content',
+        which means the length of this 'package_content',
         and including the checking byte.
-	[4] - [5]: Package id.
+    [4] - [5]: Package id.
     [6] - [9]: System timestamp of this package content.
     [10] - [n]: Hex data.
     [n + 1]: Sum check byte of this package.
@@ -57,7 +57,7 @@ using namespace SLAM_UTILITY;
 namespace SLAM_DATA_LOG {
 
 enum class ItemType : uint8_t {
-	kUint8 = 0,
+    kUint8 = 0,
     kInt8 = 1,
     kUint16 = 2,
     kInt16 = 3,
@@ -72,7 +72,7 @@ enum class ItemType : uint8_t {
 };
 
 static std::vector<std::string> item_type_strings = {
-	"kUint8",
+    "kUint8",
     "kInt8",
     "kUint16",
     "kInt16",
