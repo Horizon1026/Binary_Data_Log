@@ -1,7 +1,7 @@
 #include "binary_data_log.h"
 #include "log_report.h"
 
-using namespace SLAM_DATA;
+using namespace SLAM_DATA_LOG;
 
 int main(int argc, char **argv) {
     ReportInfo(YELLOW ">> Test binary data log decodec." RESET_COLOR);
@@ -44,6 +44,13 @@ int main(int argc, char **argv) {
         } else {
             ReportInfo("Test failed: register a new package.");
         }
+    }
+
+    // Prepare for recording.
+    if (logger.PrepareForRecording()) {
+        ReportInfo("Prepare for recording.");
+    } else {
+        ReportInfo("Test failed: prepare for recording.");
     }
 
     // Report all registered packages.

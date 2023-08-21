@@ -7,15 +7,15 @@
 
 // The log file 'log.binlog' is combined with header, packages_name and packages_content.
 
-/* Header */
+/* Part 1: Header */
 /*
-[0]: Offset index to the beginning of 'packages_name'
+[0] - [3]: Offset index to the beginning of 'packages_name'
     which means the whole length of 'header',
     but has no checking type.
-[1] - [n]: 'BinaryDataLog', which is fixed texts.
+[4] - [n]: 'BinaryDataLog', which is fixed texts.
 */
 
-/* Packages' name */
+/* Part 2: Packages' name */
 /*
 [0] - [3]: Offset index to the beginning of 'packages_content',
 	which means the whole length of all 'packages_name',
@@ -38,7 +38,7 @@ for each package:
 
 */
 
-/* Packages' content */
+/* Part 3: Packages' content */
 /*
 
 for each package:
@@ -53,6 +53,8 @@ for each package:
 */
 
 using namespace SLAM_UTILITY;
+
+namespace SLAM_DATA_LOG {
 
 enum class ItemType : uint8_t {
 	kUint8 = 0,
@@ -84,6 +86,8 @@ static std::vector<std::string> item_type_strings = {
     "kImageU8C3",
 };
 
+static std::string binary_log_file_header = "SLAM_DATA_LOG";
+
 struct PackageItem {
     ItemType type = ItemType::kUint32;
     std::string name;
@@ -94,5 +98,7 @@ struct Package {
     std::string name;
     std::vector<PackageItem> items;
 };
+
+}
 
 #endif // end of _BINARY_DATA_LOG_FILE_PROTOCAL_H_

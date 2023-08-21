@@ -10,7 +10,7 @@
 #include "vector"
 #include "unordered_map"
 
-namespace SLAM_DATA {
+namespace SLAM_DATA_LOG {
 
 /* Class BinaryDataLog Declaration. */
 class BinaryDataLog {
@@ -23,7 +23,13 @@ public:
 
     bool RegisterPackage(std::unique_ptr<Package> &new_package);
 
+    bool PrepareForRecording();
+
     void ReportAllRegisteredPackages();
+
+private:
+    void WriteLogFileHeader();
+    bool WriteAllRegisteredPackages();
 
 private:
     std::unique_ptr<std::fstream> file_ptr_ = nullptr;
