@@ -5,7 +5,9 @@
 
 #include "iostream"
 #include "fstream"
+#include "chrono"
 #include "memory"
+
 #include "string"
 #include "vector"
 #include "unordered_map"
@@ -32,13 +34,14 @@ public:
 
 private:
     void WriteLogFileHeader();
-    bool WriteAllRegisteredPackages();
+    bool RecordAllRegisteredPackages();
     uint8_t SummaryBytes(const uint8_t *byte_ptr, const uint32_t size, const uint8_t init_value);
 
 private:
     std::unique_ptr<std::fstream> file_ptr_ = nullptr;
     std::vector<std::unique_ptr<Package>> packages_;
     std::unordered_map<uint16_t, uint32_t> packages_id_with_size_;
+    std::chrono::time_point<std::chrono::system_clock> start_system_time_ = std::chrono::system_clock::now();
 };
 
 }
