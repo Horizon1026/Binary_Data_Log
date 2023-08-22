@@ -21,12 +21,12 @@ struct BaroData {
 
 #pragma pack()
 
-int main(int argc, char **argv) {
-    ReportInfo(YELLOW ">> Test binary data log decodec." RESET_COLOR);
+void TestCreateLog(const std::string &log_file_name) {
+    ReportInfo(YELLOW ">> Test creating binary data log." RESET_COLOR);
 
     // Create a log file.
     BinaryDataLog logger;
-    if (logger.CreateLogFile()) {
+    if (logger.CreateLogFile(log_file_name)) {
         ReportInfo("Create a new log file.");
     } else {
         ReportInfo("Test failed: create a new log file.");
@@ -82,6 +82,25 @@ int main(int argc, char **argv) {
         BaroData baro_data;
         logger.RecordPackage(2, reinterpret_cast<const char *>(&baro_data));
     }
+}
+
+void TestLoadLog(const std::string &log_file_name) {
+    ReportInfo(YELLOW ">> Test loading binary data log." RESET_COLOR);
+
+    BinaryDataLog logger;
+    if (logger.LoadLogFile(log_file_name)) {
+        ReportInfo("Load a new log file.");
+    } else {
+        ReportInfo("Test failed: load a new log file.");
+    }
+}
+
+int main(int argc, char **argv) {
+    ReportInfo(YELLOW ">> Test binary data log decodec." RESET_COLOR);
+
+    const std::string log_file_name = "data.binlog";
+    TestCreateLog(log_file_name);
+    TestLoadLog(log_file_name);
 
     return 0;
 }

@@ -51,7 +51,6 @@ bool BinaryDataLog::RegisterPackage(std::unique_ptr<Package> &new_package) {
         size += item_type_sizes[static_cast<uint32_t>(item.type)];
     }
     packages_id_with_size_.insert(std::make_pair(package_id, size));
-    ReportDebug("package size is " << size);
 
     return true;
 }

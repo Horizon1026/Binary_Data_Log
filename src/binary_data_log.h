@@ -21,15 +21,17 @@ public:
     BinaryDataLog() = default;
     virtual ~BinaryDataLog();
 
+    // Support for recorder.
     bool CreateLogFile(const std::string &log_file_name = "data.binlog");
-
     bool RegisterPackage(std::unique_ptr<Package> &new_package);
-
     bool PrepareForRecording();
-
     bool RecordPackage(const uint16_t package_id,
                        const char *data_ptr);
 
+    // Support for decoder.
+    bool LoadLogFile(const std::string &log_file_name);
+
+    // Support for information.
     void ReportAllRegisteredPackages();
 
 private:
