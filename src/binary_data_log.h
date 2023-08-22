@@ -25,15 +25,20 @@ public:
 
     bool PrepareForRecording();
 
+    bool RecordPackage(const uint16_t package_id,
+                       const char *data_ptr);
+
     void ReportAllRegisteredPackages();
 
 private:
     void WriteLogFileHeader();
     bool WriteAllRegisteredPackages();
+    uint8_t SummaryBytes(const uint8_t *byte_ptr, const uint32_t size, const uint8_t init_value);
 
 private:
     std::unique_ptr<std::fstream> file_ptr_ = nullptr;
-    std::unordered_map<uint16_t, std::unique_ptr<Package>> packages_;
+    std::vector<std::unique_ptr<Package>> packages_;
+    std::unordered_map<uint16_t, uint32_t> packages_id_with_size_;
 };
 
 }

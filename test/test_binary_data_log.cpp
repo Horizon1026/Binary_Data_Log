@@ -3,6 +3,24 @@
 
 using namespace SLAM_DATA_LOG;
 
+#pragma pack(1)
+
+struct ImuData {
+    float gyro_x = 0.0f;
+    float gyro_y = 0.0f;
+    float gyro_z = 0.0f;
+    float accel_x = 0.0f;
+    float accel_y = 0.0f;
+    float accel_z = 0.0f;
+};
+
+struct BaroData {
+    uint32_t press = 0;
+    float height = 0.0f;
+};
+
+#pragma pack()
+
 int main(int argc, char **argv) {
     ReportInfo(YELLOW ">> Test binary data log decodec." RESET_COLOR);
 
@@ -55,6 +73,15 @@ int main(int argc, char **argv) {
 
     // Report all registered packages.
     logger.ReportAllRegisteredPackages();
+
+    // Record data.
+    {
+        ImuData imu_data;
+        logger.RecordPackage(1, reinterpret_cast<const char *>(&imu_data));
+
+        BaroData baro_data;
+        logger.RecordPackage(2, reinterpret_cast<const char *>(&baro_data));
+    }
 
     return 0;
 }

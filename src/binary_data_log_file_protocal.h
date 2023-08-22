@@ -9,10 +9,7 @@
 
 /* Part 1: Header */
 /*
-[0] - [3]: Offset index to the beginning of 'packages_name'
-    which means the whole length of 'header',
-    but has no checking type.
-[4] - [n]: 'BinaryDataLog', which is fixed texts.
+[0] - [n]: 'BinaryDataLog', which is fixed texts.
 */
 
 /* Part 2: Packages' name */
@@ -46,8 +43,8 @@ for each package:
         which means the length of this 'package_content',
         and including the checking byte.
     [4] - [5]: Package id.
-    [6] - [9]: System timestamp of this package content.
-    [10] - [n]: Hex data.
+    [6] - [9]: System timestamp of this package content. Unit is millisecond.
+    [10] - [n]: Binary data.
     [n + 1]: Sum check byte of this package.
 
 */
@@ -69,6 +66,21 @@ enum class ItemType : uint8_t {
     kDouble = 9,
     kImageU8C1 = 10,
     kImageU8C3 = 11,
+};
+
+static std::vector<uint32_t> item_type_sizes = {
+    1,  // kUint8.
+    1,  // kInt8.
+    2,  // kUint16.
+    2,  // kInt16.
+    4,  // kUint32.
+    4,  // kInt32.
+    8,  // kUint64.
+    8,  // kInt64.
+    4,  // kFloat.
+    8,  // kDouble.
+    0,  // kImageU8C1.
+    0,  // kImageU8C3.
 };
 
 static std::vector<std::string> item_type_strings = {
