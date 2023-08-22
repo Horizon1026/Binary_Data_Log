@@ -37,8 +37,11 @@ public:
 private:
     void WriteLogFileHeader();
     bool RecordAllRegisteredPackages();
-    uint8_t SummaryBytes(const uint8_t *byte_ptr, const uint32_t size, const uint8_t init_value);
-
+    uint8_t SummaryBytes(const uint8_t *byte_ptr,
+                         const uint32_t size,
+                         const uint8_t init_value);
+    std::string LoadStringFromBinaryFile(std::ifstream &log_file,
+                                         uint32_t size);
 private:
     std::unique_ptr<std::fstream> file_ptr_ = nullptr;
     std::vector<std::unique_ptr<Package>> packages_;

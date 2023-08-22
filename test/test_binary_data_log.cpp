@@ -93,6 +93,9 @@ void TestLoadLog(const std::string &log_file_name) {
     } else {
         ReportInfo("Test failed: load a new log file.");
     }
+
+    // Report all registered packages.
+    // logger.ReportAllRegisteredPackages();
 }
 
 int main(int argc, char **argv) {

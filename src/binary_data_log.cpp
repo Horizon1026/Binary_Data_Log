@@ -72,6 +72,18 @@ uint8_t BinaryDataLog::SummaryBytes(const uint8_t *byte_ptr, const uint32_t size
     return value;
 }
 
+std::string BinaryDataLog::LoadStringFromBinaryFile(std::ifstream &log_file,
+                                                    uint32_t size) {
+    char *buffer = new char[size + 1];
+    log_file.read(buffer, size);
+    buffer[size] = '\0';
+
+    std::string str(buffer);
+    delete[] buffer;
+
+    return str;
+}
+
 void BinaryDataLog::ReportAllRegisteredPackages() {
     ReportInfo("[DataLog] All registered packages:");
     for (const auto &package : packages_) {
