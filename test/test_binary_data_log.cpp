@@ -95,7 +95,7 @@ void TestLoadLog(const std::string &log_file_name) {
     }
 
     // Report all registered packages.
-    // logger.ReportAllRegisteredPackages();
+    logger.ReportAllRegisteredPackages();
 }
 
 int main(int argc, char **argv) {
