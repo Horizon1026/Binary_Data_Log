@@ -41,7 +41,7 @@ bool BinaryDataLog::RecordAllRegisteredPackages() {
     for (auto &package : packages_) {
         // Write the offset index to the next package name.
         file_ptr_->write(reinterpret_cast<const char *>(&offsets[index]), 4);
-        uint8_t sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&offsets[index]), 4, sum_check_byte);
+        uint8_t sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&offsets[index]), 4, 0);
         ++index;
         // Write the package id.
         file_ptr_->write(reinterpret_cast<const char *>(&package->id), 2);
