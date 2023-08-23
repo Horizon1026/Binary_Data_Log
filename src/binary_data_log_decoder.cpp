@@ -84,6 +84,21 @@ bool BinaryDataLog::LoadLogFile(const std::string &log_file_name) {
         RegisterPackage(package_ptr);
     }
 
+    // TODO: Load data.
+
+    return true;
+}
+
+bool BinaryDataLog::LoadOnePackage(std::ifstream &log_file) {
+    // Load offset to the next content.
+    uint32_t offset_to_next_content = 0;
+    log_file.read(reinterpret_cast<char *>(&offset_to_next_content), 4);
+    uint8_t sum_check_byte = SummaryBytes(reinterpret_cast<uint8_t *>(&offset_to_next_content), 4, 0);
+
+    // Load package id.
+    uint16_t package_id = 0;
+    log_file.read(reinterpret_cast<char *>(&package_id), 2);
+
     return true;
 }
 

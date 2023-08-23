@@ -14,6 +14,11 @@
 
 namespace SLAM_DATA_LOG {
 
+struct TimestampedData {
+    uint32_t timestamp_ms = 0;
+    std::vector<uint8_t> data;
+};
+
 /* Class BinaryDataLog Declaration. */
 class BinaryDataLog {
 
@@ -35,18 +40,31 @@ public:
     void ReportAllRegisteredPackages();
 
 private:
-    void WriteLogFileHeader();
-    bool RecordAllRegisteredPackages();
+    // Support for decodec.
     uint8_t SummaryBytes(const uint8_t *byte_ptr,
                          const uint32_t size,
                          const uint8_t init_value);
     std::string LoadStringFromBinaryFile(std::ifstream &log_file,
                                          uint32_t size);
+
+    // Support for recorder.
+    void WriteLogFileHeader();
+    bool RecordAllRegisteredPackages();
+
+    // Support for decoder.
+    bool LoadOnePackage(std::ifstream &log_file);
+
 private:
-    std::unique_ptr<std::fstream> file_ptr_ = nullptr;
+    // Support for decodec.
     std::vector<std::unique_ptr<Package>> packages_;
     std::unordered_map<uint16_t, uint32_t> packages_id_with_size_;
+
+    // Support for recorder.
+    std::unique_ptr<std::fstream> file_ptr_ = nullptr;
     std::chrono::time_point<std::chrono::system_clock> start_system_time_ = std::chrono::system_clock::now();
+
+    // Support for decoder.
+    std::unordered_map<uint16_t, std::vector<TimestampedData>> packages_id_with_data_;
 };
 
 }
