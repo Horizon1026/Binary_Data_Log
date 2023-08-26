@@ -19,6 +19,11 @@ struct TimestampedData {
     std::vector<uint8_t> data;
 };
 
+struct TimestampedDataIndex {
+    uint32_t timestamp_ms = 0;
+    uint32_t index_in_file = 0;
+};
+
 /* Class BinaryDataLog Declaration. */
 class BinaryDataLog {
 
@@ -35,6 +40,7 @@ public:
 
     // Support for decoder.
     bool LoadLogFile(const std::string &log_file_name);
+    bool PreloadLogFile(const std::string &log_file_name);
 
     // Support for information.
     void ReportAllRegisteredPackages();
@@ -62,7 +68,10 @@ private:
     bool RecordAllRegisteredPackages();
 
     // Support for decoder.
+    bool CheckLogFileHeader(std::ifstream &log_file);
+    bool LoadRegisteredPackages(std::ifstream &log_file);
     bool LoadOnePackage(std::ifstream &log_file);
+    bool PreloadOnePackage(std::ifstream &log_file);
 
 private:
     // Support for decodec.
@@ -74,6 +83,7 @@ private:
 
     // Support for decoder.
     std::unordered_map<uint16_t, std::vector<TimestampedData>> packages_id_with_data_;
+    std::unordered_map<uint16_t, std::vector<TimestampedDataIndex>> packages_id_with_index_;
 };
 
 }

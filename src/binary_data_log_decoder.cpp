@@ -12,12 +12,56 @@ bool BinaryDataLog::LoadLogFile(const std::string &log_file_name) {
         return false;
     }
 
+    // Check header.
+    RETURN_FALSE_IF_FALSE(CheckLogFileHeader(log_file));
+
+    // Load all registered packages information.
+    RETURN_FALSE_IF_FALSE(LoadRegisteredPackages(log_file));
+
+    // Load all data.
+    while (1) {
+        BREAK_IF(!LoadOnePackage(log_file));
+    }
+
+    return true;
+}
+
+bool BinaryDataLog::PreloadLogFile(const std::string &log_file_name) {
+    std::ifstream log_file;
+    log_file.open(log_file_name.c_str(), std::ios::in | std::ios::binary);
+    if (!log_file.is_open()) {
+        ReportError("[DataLog] Cannot open log file : " << log_file_name);
+        return false;
+    }
+
+    // Check header.
+    RETURN_FALSE_IF_FALSE(CheckLogFileHeader(log_file));
+
+    // Load all registered packages information.
+    RETURN_FALSE_IF_FALSE(LoadRegisteredPackages(log_file));
+
+    // Load all data indice.
+    while (1) {
+        BREAK_IF(!PreloadOnePackage(log_file));
+    }
+
+    return true;
+}
+
+bool BinaryDataLog::CheckLogFileHeader(std::ifstream &log_file) {
+    log_file.seekg(0);
+
     std::string temp_header = binary_log_file_header;
     log_file.read(temp_header.data(), binary_log_file_header.size());
     if (temp_header != binary_log_file_header) {
         ReportWarn("[DataLog] Log header error, it cannot be decoded.");
         return false;
     }
+    return true;
+}
+
+bool BinaryDataLog::LoadRegisteredPackages(std::ifstream &log_file) {
+    log_file.seekg(binary_log_file_header.size());
 
     packages_id_with_objects_.clear();
 
@@ -84,11 +128,6 @@ bool BinaryDataLog::LoadLogFile(const std::string &log_file_name) {
         RegisterPackage(package_ptr);
     }
 
-    // Load all data.
-    while (1) {
-        BREAK_IF(!LoadOnePackage(log_file));
-    }
-
     return true;
 }
 
@@ -143,6 +182,12 @@ bool BinaryDataLog::LoadOnePackage(std::ifstream &log_file) {
     }
     delete[] buffer;
 
+    return true;
+}
+
+
+bool BinaryDataLog::PreloadOnePackage(std::ifstream &log_file) {
+    // TODO:
     return true;
 }
 
