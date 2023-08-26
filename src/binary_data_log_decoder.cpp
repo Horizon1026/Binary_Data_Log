@@ -4,7 +4,7 @@
 
 namespace SLAM_DATA_LOG {
 
-bool BinaryDataLog::LoadLogFile(const std::string &log_file_name, bool config_load_data) {
+bool BinaryDataLog::LoadLogFile(const std::string &log_file_name, bool set_load_data) {
     std::ifstream log_file;
     log_file.open(log_file_name.c_str(), std::ios::in | std::ios::binary);
     if (!log_file.is_open()) {
@@ -20,7 +20,7 @@ bool BinaryDataLog::LoadLogFile(const std::string &log_file_name, bool config_lo
 
     // Load all data.
     while (1) {
-        BREAK_IF(!LoadOnePackage(log_file, config_load_data));
+        BREAK_IF(!LoadOnePackage(log_file, set_load_data));
     }
 
     return true;
@@ -109,7 +109,7 @@ bool BinaryDataLog::LoadRegisteredPackages(std::ifstream &log_file) {
     return true;
 }
 
-bool BinaryDataLog::LoadOnePackage(std::ifstream &log_file, bool config_load_data) {
+bool BinaryDataLog::LoadOnePackage(std::ifstream &log_file, bool set_load_data) {
     // Record the index in log file.
     TimestampedData timestamped_data;
     timestamped_data.index_in_file = log_file.tellg();
@@ -158,7 +158,7 @@ bool BinaryDataLog::LoadOnePackage(std::ifstream &log_file, bool config_load_dat
     auto &packages = packages_id_with_data_[package_id];
     packages.emplace_back(timestamped_data);
 
-    if (config_load_data) {
+    if (set_load_data) {
         packages.back().data.reserve(data_size);
         for (uint32_t i = 0; i < data_size; ++i) {
             packages.back().data.emplace_back(buffer[i]);

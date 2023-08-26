@@ -84,7 +84,7 @@ void TestCreateLog(const std::string &log_file_name) {
         BaroData baro_data = { i };
         logger.RecordPackage(2, reinterpret_cast<const char *>(&baro_data));
 
-        usleep(100000);
+        usleep(10000);
     }
 }
 
@@ -105,12 +105,30 @@ void TestLoadLog(const std::string &log_file_name) {
     logger.ReportAllLoadedPackages();
 }
 
+void TestPreloadLog(const std::string &log_file_name) {
+    ReportInfo(YELLOW ">> Test loading binary data log." RESET_COLOR);
+
+    BinaryDataLog logger;
+    if (logger.LoadLogFile(log_file_name, false)) {
+        ReportInfo("Load a new log file.");
+    } else {
+        ReportInfo("Test failed: load a new log file.");
+    }
+
+    // Report all registered packages.
+    logger.ReportAllRegisteredPackages();
+
+    // Report all loaded packages.
+    logger.ReportAllLoadedPackages();
+}
+
 int main(int argc, char **argv) {
     ReportInfo(YELLOW ">> Test binary data log decodec." RESET_COLOR);
 
     const std::string log_file_name = "data.binlog";
     TestCreateLog(log_file_name);
     TestLoadLog(log_file_name);
+    TestPreloadLog(log_file_name);
 
     return 0;
 }

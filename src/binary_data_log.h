@@ -34,7 +34,7 @@ public:
     bool RecordPackage(const uint16_t package_id, const char *data_ptr);
 
     // Support for decoder.
-    bool LoadLogFile(const std::string &log_file_name, bool config_load_data = true);
+    bool LoadLogFile(const std::string &log_file_name, bool set_load_data = true);
 
     // Support for information.
     void ReportAllRegisteredPackages();
@@ -64,7 +64,7 @@ private:
     // Support for decoder.
     bool CheckLogFileHeader(std::ifstream &log_file);
     bool LoadRegisteredPackages(std::ifstream &log_file);
-    bool LoadOnePackage(std::ifstream &log_file, bool config_load_data = true);
+    bool LoadOnePackage(std::ifstream &log_file, bool set_load_data = true);
     bool PreloadOnePackage(std::ifstream &log_file);
 
 private:
