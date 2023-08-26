@@ -37,20 +37,20 @@ bool BinaryDataLog::RegisterPackage(std::unique_ptr<Package> &new_package) {
         return false;
     }
 
-    if (packages_id_with_size_.find(new_package->id) != packages_id_with_size_.end()) {
+    if (packages_id_with_objects_.find(new_package->id) != packages_id_with_objects_.end()) {
         ReportError("[DataLog] Package to be registered is exist now.");
         return false;
     }
 
     const uint16_t package_id = new_package->id;
-    packages_.emplace_back(std::move(new_package));
+    Package *package_ptr = new_package.get();
+    packages_id_with_objects_.insert(std::make_pair(package_id, std::move(new_package)));
 
     // Statis the whole size of binary data in this package.
-    uint32_t size = 0;
-    for (const auto &item : packages_.back()->items) {
-        size += item_type_sizes[static_cast<uint32_t>(item.type)];
+    package_ptr->size = 0;
+    for (const auto &item : package_ptr->items) {
+        package_ptr->size += item_type_sizes[static_cast<uint32_t>(item.type)];
     }
-    packages_id_with_size_.insert(std::make_pair(package_id, size));
 
     return true;
 }
@@ -86,12 +86,27 @@ std::string BinaryDataLog::LoadStringFromBinaryFile(std::ifstream &log_file,
 
 void BinaryDataLog::ReportAllRegisteredPackages() {
     ReportInfo("[DataLog] All registered packages:");
-    for (const auto &package : packages_) {
+    for (const auto &pair : packages_id_with_objects_) {
+        const auto &package = pair.second;
         ReportInfo(">> Package name : " << package->name);
         ReportInfo("   Package id : " << package->id);
         ReportInfo("   Package items :");
         for (const auto &item : package->items) {
             ReportInfo("      [" << item_type_strings[static_cast<uint32_t>(item.type)] << "] : " << item.name);
+        }
+    }
+}
+
+void BinaryDataLog::ReportAllLoadedPackages() {
+    ReportInfo("[DataLog] All loaded package:");
+    for (const auto &package : packages_id_with_data_) {
+        ReportInfo(">> Package id : " << package.first);
+        for (const auto &data : package.second) {
+            ReportText(GREEN "[Info ] " RESET_COLOR "      [time | data] " << data.timestamp_ms << " | ");
+            for (const uint8_t &byte : data.data) {
+                ReportText(static_cast<int32_t>(byte) << " ");
+            }
+            ReportText(std::endl);
         }
     }
 }

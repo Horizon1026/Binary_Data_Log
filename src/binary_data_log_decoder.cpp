@@ -19,7 +19,7 @@ bool BinaryDataLog::LoadLogFile(const std::string &log_file_name) {
         return false;
     }
 
-    packages_.clear();
+    packages_id_with_objects_.clear();
 
     // Load offset index to the beginning of 'packages_content'.
     uint32_t offset_to_data_part = 0;
@@ -84,7 +84,10 @@ bool BinaryDataLog::LoadLogFile(const std::string &log_file_name) {
         RegisterPackage(package_ptr);
     }
 
-    // TODO: Load data.
+    // Load all data.
+    while (1) {
+        BREAK_IF(!LoadOnePackage(log_file));
+    }
 
     return true;
 }
@@ -95,9 +98,50 @@ bool BinaryDataLog::LoadOnePackage(std::ifstream &log_file) {
     log_file.read(reinterpret_cast<char *>(&offset_to_next_content), 4);
     uint8_t sum_check_byte = SummaryBytes(reinterpret_cast<uint8_t *>(&offset_to_next_content), 4, 0);
 
+    // Check if this is the end of log file.
+    RETURN_FALSE_IF(log_file.eof());
+
     // Load package id.
     uint16_t package_id = 0;
     log_file.read(reinterpret_cast<char *>(&package_id), 2);
+    sum_check_byte = SummaryBytes(reinterpret_cast<uint8_t *>(&package_id), 2, sum_check_byte);
+
+    // Check if this data package id is registered.
+    const auto it = packages_id_with_objects_.find(package_id);
+    if (it == packages_id_with_objects_.end()) {
+        ReportWarn("[DataLog] Load one package data failed. Package id " << package_id <<
+            " is not registered.");
+        return false;
+    }
+
+    // Load system timestamp.
+    TimestampedData timestamped_data;
+    log_file.read(reinterpret_cast<char *>(&timestamped_data.timestamp_ms), 4);
+    sum_check_byte = SummaryBytes(reinterpret_cast<uint8_t *>(&timestamped_data.timestamp_ms), 4, sum_check_byte);
+
+    // Load data.
+    const uint32_t data_size = it->second->size;
+    char *buffer = new char[data_size];
+    log_file.read(buffer, data_size);
+    sum_check_byte = SummaryBytes(reinterpret_cast<uint8_t *>(buffer), data_size, sum_check_byte);
+
+    // Check summary byte.
+    uint8_t loaded_sum_check_byte = 0;
+    log_file.read(reinterpret_cast<char *>(&loaded_sum_check_byte), 1);
+    if (loaded_sum_check_byte != sum_check_byte) {
+        ReportWarn("[DataLog] Load one package data failed. Summary check error.");
+        delete[] buffer;
+        return false;
+    }
+
+    // Store this data package.
+    auto &packages = packages_id_with_data_[package_id];
+    packages.emplace_back(timestamped_data);
+    packages.back().data.reserve(data_size);
+    for (uint32_t i = 0; i < data_size; ++i) {
+        packages.back().data.emplace_back(buffer[i]);
+    }
+    delete[] buffer;
 
     return true;
 }

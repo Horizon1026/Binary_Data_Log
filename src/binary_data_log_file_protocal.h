@@ -109,6 +109,7 @@ struct Package {
     uint16_t id = 0;
     std::string name;
     std::vector<PackageItem> items;
+    uint32_t size = 0;
 };
 
 }

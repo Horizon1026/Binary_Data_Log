@@ -1,6 +1,8 @@
 #include "binary_data_log.h"
 #include "log_report.h"
 
+#include "unistd.h"
+
 using namespace SLAM_DATA_LOG;
 
 #pragma pack(1)
@@ -75,12 +77,14 @@ void TestCreateLog(const std::string &log_file_name) {
     logger.ReportAllRegisteredPackages();
 
     // Record data.
-    {
-        ImuData imu_data;
+    for (uint32_t i = 0; i < 20; ++i) {
+        ImuData imu_data = { static_cast<float>(i) };
         logger.RecordPackage(1, reinterpret_cast<const char *>(&imu_data));
 
-        BaroData baro_data;
+        BaroData baro_data = { i };
         logger.RecordPackage(2, reinterpret_cast<const char *>(&baro_data));
+
+        usleep(100000);
     }
 }
 
@@ -96,6 +100,9 @@ void TestLoadLog(const std::string &log_file_name) {
 
     // Report all registered packages.
     logger.ReportAllRegisteredPackages();
+
+    // Report all loaded packages.
+    logger.ReportAllLoadedPackages();
 }
 
 int main(int argc, char **argv) {

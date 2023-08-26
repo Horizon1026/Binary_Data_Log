@@ -38,6 +38,16 @@ public:
 
     // Support for information.
     void ReportAllRegisteredPackages();
+    void ReportAllLoadedPackages();
+
+    // Const Reference for member variables.
+    // Support for decodec.
+    const std::unordered_map<uint16_t, std::unique_ptr<Package>> &packages_id_with_objects() const { return packages_id_with_objects_; }
+    // Support for recorder.
+    const std::unique_ptr<std::fstream> &file_ptr() const { return file_ptr_; }
+    const std::chrono::time_point<std::chrono::system_clock> &start_system_time() const { return start_system_time_; }
+    // Support for decoder.
+    const std::unordered_map<uint16_t, std::vector<TimestampedData>> &packages_id_with_data() const { return packages_id_with_data_; }
 
 private:
     // Support for decodec.
@@ -56,8 +66,7 @@ private:
 
 private:
     // Support for decodec.
-    std::vector<std::unique_ptr<Package>> packages_;
-    std::unordered_map<uint16_t, uint32_t> packages_id_with_size_;
+    std::unordered_map<uint16_t, std::unique_ptr<Package>> packages_id_with_objects_;
 
     // Support for recorder.
     std::unique_ptr<std::fstream> file_ptr_ = nullptr;

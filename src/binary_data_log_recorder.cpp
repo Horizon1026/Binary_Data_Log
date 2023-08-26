@@ -7,14 +7,16 @@
 namespace SLAM_DATA_LOG {
 
 bool BinaryDataLog::RecordAllRegisteredPackages() {
-    if (packages_.empty()) {
+    if (packages_id_with_objects_.empty()) {
         ReportInfo("[DataLog] No registered package.");
         return false;
     }
 
     // Statis the whole size.
     std::vector<uint32_t> offsets(1, 4);
-    for (const auto &package : packages_) {
+    for (const auto &pair : packages_id_with_objects_) {
+        const auto &package = pair.second;
+
         uint32_t offset_to_next_package = 4;    // Offset itself.
         offset_to_next_package += 2;    // Package id.
         offset_to_next_package += 1;    // Length of package name string.
@@ -38,7 +40,9 @@ bool BinaryDataLog::RecordAllRegisteredPackages() {
 
     // Iterate each package.
     uint32_t index = 1;
-    for (auto &package : packages_) {
+    for (auto &pair : packages_id_with_objects_) {
+        auto &package = pair.second;
+
         // Write the offset index to the next package name.
         file_ptr_->write(reinterpret_cast<const char *>(&offsets[index]), 4);
         uint8_t sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&offsets[index]), 4, 0);
@@ -80,14 +84,14 @@ bool BinaryDataLog::RecordPackage(const uint16_t package_id,
     RETURN_FALSE_IF(file_ptr_ == nullptr);
     RETURN_FALSE_IF(data_ptr == nullptr);
 
-    const auto it = packages_id_with_size_.find(package_id);
-    if (it == packages_id_with_size_.end()) {
+    const auto it = packages_id_with_objects_.find(package_id);
+    if (it == packages_id_with_objects_.end()) {
         ReportError("[DataLog] Package id " << package_id << " is not registered.");
         return false;
     }
 
     // Write the offset to the next package data.
-    const uint32_t offset = 4 + 2 + 4 + it->second + 1;
+    const uint32_t offset = 4 + 2 + 4 + it->second->size + 1;
     file_ptr_->write(reinterpret_cast<const char *>(&offset), 4);
     uint8_t sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&offset), 4, 0);
 
@@ -103,8 +107,8 @@ bool BinaryDataLog::RecordPackage(const uint16_t package_id,
     sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&timestamp), 4, sum_check_byte);
 
     // Write the binary data.
-    file_ptr_->write(data_ptr, it->second);
-    sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(data_ptr), it->second, sum_check_byte);
+    file_ptr_->write(data_ptr, it->second->size);
+    sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(data_ptr), it->second->size, sum_check_byte);
 
     // Write the summary check byte.
     file_ptr_->write(reinterpret_cast<const char *>(&sum_check_byte), 1);
