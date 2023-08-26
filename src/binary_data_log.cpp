@@ -100,9 +100,10 @@ void BinaryDataLog::ReportAllRegisteredPackages() {
 void BinaryDataLog::ReportAllLoadedPackages() {
     ReportInfo("[DataLog] All loaded package:");
     for (const auto &package : packages_id_with_data_) {
-        ReportInfo(">> Package id : " << package.first);
+        ReportInfo(">> Package id : " << package.first << ", context [ time | index | data ] :");
         for (const auto &data : package.second) {
-            ReportText(GREEN "[Info ] " RESET_COLOR "      [time | data] " << data.timestamp_ms << " | ");
+            ReportText(GREEN "[Info ] " RESET_COLOR "      " << data.timestamp_ms << " | ");
+            ReportText(data.index_in_file << " | ");
             for (const uint8_t &byte : data.data) {
                 ReportText(static_cast<int32_t>(byte) << " ");
             }

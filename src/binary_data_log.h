@@ -17,10 +17,6 @@ namespace SLAM_DATA_LOG {
 struct TimestampedData {
     uint32_t timestamp_ms = 0;
     std::vector<uint8_t> data;
-};
-
-struct TimestampedDataIndex {
-    uint32_t timestamp_ms = 0;
     uint32_t index_in_file = 0;
 };
 
@@ -35,12 +31,10 @@ public:
     bool CreateLogFile(const std::string &log_file_name = "data.binlog");
     bool RegisterPackage(std::unique_ptr<Package> &new_package);
     bool PrepareForRecording();
-    bool RecordPackage(const uint16_t package_id,
-                       const char *data_ptr);
+    bool RecordPackage(const uint16_t package_id, const char *data_ptr);
 
     // Support for decoder.
-    bool LoadLogFile(const std::string &log_file_name);
-    bool PreloadLogFile(const std::string &log_file_name);
+    bool LoadLogFile(const std::string &log_file_name, bool config_load_data = true);
 
     // Support for information.
     void ReportAllRegisteredPackages();
@@ -70,7 +64,7 @@ private:
     // Support for decoder.
     bool CheckLogFileHeader(std::ifstream &log_file);
     bool LoadRegisteredPackages(std::ifstream &log_file);
-    bool LoadOnePackage(std::ifstream &log_file);
+    bool LoadOnePackage(std::ifstream &log_file, bool config_load_data = true);
     bool PreloadOnePackage(std::ifstream &log_file);
 
 private:
@@ -83,7 +77,6 @@ private:
 
     // Support for decoder.
     std::unordered_map<uint16_t, std::vector<TimestampedData>> packages_id_with_data_;
-    std::unordered_map<uint16_t, std::vector<TimestampedDataIndex>> packages_id_with_index_;
 };
 
 }

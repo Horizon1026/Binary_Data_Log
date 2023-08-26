@@ -4,7 +4,7 @@
 
 namespace SLAM_DATA_LOG {
 
-bool BinaryDataLog::LoadLogFile(const std::string &log_file_name) {
+bool BinaryDataLog::LoadLogFile(const std::string &log_file_name, bool config_load_data) {
     std::ifstream log_file;
     log_file.open(log_file_name.c_str(), std::ios::in | std::ios::binary);
     if (!log_file.is_open()) {
@@ -20,29 +20,7 @@ bool BinaryDataLog::LoadLogFile(const std::string &log_file_name) {
 
     // Load all data.
     while (1) {
-        BREAK_IF(!LoadOnePackage(log_file));
-    }
-
-    return true;
-}
-
-bool BinaryDataLog::PreloadLogFile(const std::string &log_file_name) {
-    std::ifstream log_file;
-    log_file.open(log_file_name.c_str(), std::ios::in | std::ios::binary);
-    if (!log_file.is_open()) {
-        ReportError("[DataLog] Cannot open log file : " << log_file_name);
-        return false;
-    }
-
-    // Check header.
-    RETURN_FALSE_IF_FALSE(CheckLogFileHeader(log_file));
-
-    // Load all registered packages information.
-    RETURN_FALSE_IF_FALSE(LoadRegisteredPackages(log_file));
-
-    // Load all data indice.
-    while (1) {
-        BREAK_IF(!PreloadOnePackage(log_file));
+        BREAK_IF(!LoadOnePackage(log_file, config_load_data));
     }
 
     return true;
@@ -131,7 +109,11 @@ bool BinaryDataLog::LoadRegisteredPackages(std::ifstream &log_file) {
     return true;
 }
 
-bool BinaryDataLog::LoadOnePackage(std::ifstream &log_file) {
+bool BinaryDataLog::LoadOnePackage(std::ifstream &log_file, bool config_load_data) {
+    // Record the index in log file.
+    TimestampedData timestamped_data;
+    timestamped_data.index_in_file = log_file.tellg();
+
     // Load offset to the next content.
     uint32_t offset_to_next_content = 0;
     log_file.read(reinterpret_cast<char *>(&offset_to_next_content), 4);
@@ -154,7 +136,6 @@ bool BinaryDataLog::LoadOnePackage(std::ifstream &log_file) {
     }
 
     // Load system timestamp.
-    TimestampedData timestamped_data;
     log_file.read(reinterpret_cast<char *>(&timestamped_data.timestamp_ms), 4);
     sum_check_byte = SummaryBytes(reinterpret_cast<uint8_t *>(&timestamped_data.timestamp_ms), 4, sum_check_byte);
 
@@ -176,9 +157,12 @@ bool BinaryDataLog::LoadOnePackage(std::ifstream &log_file) {
     // Store this data package.
     auto &packages = packages_id_with_data_[package_id];
     packages.emplace_back(timestamped_data);
-    packages.back().data.reserve(data_size);
-    for (uint32_t i = 0; i < data_size; ++i) {
-        packages.back().data.emplace_back(buffer[i]);
+
+    if (config_load_data) {
+        packages.back().data.reserve(data_size);
+        for (uint32_t i = 0; i < data_size; ++i) {
+            packages.back().data.emplace_back(buffer[i]);
+        }
     }
     delete[] buffer;
 
