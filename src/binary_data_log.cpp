@@ -11,6 +11,21 @@ BinaryDataLog::~BinaryDataLog() {
     }
 }
 
+void BinaryDataLog::CleanUp() {
+    // Support for decodec.
+    packages_id_with_objects_.clear();
+
+    // Support for recorder.
+    if (file_ptr_ != nullptr) {
+        file_ptr_->close();
+    }
+    file_ptr_ = nullptr;
+    start_system_time_ = std::chrono::system_clock::now();
+
+    // Support for decoder.
+    packages_id_with_data_.clear();
+}
+
 bool BinaryDataLog::CreateLogFile(const std::string &log_file_name) {
     // If last log file is not closed, close it.
     if (file_ptr_ != nullptr) {

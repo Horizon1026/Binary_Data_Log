@@ -27,6 +27,8 @@ public:
     BinaryDataLog() = default;
     virtual ~BinaryDataLog();
 
+    void CleanUp();
+
     // Support for recorder.
     bool CreateLogFile(const std::string &log_file_name = "data.binlog");
     bool RegisterPackage(std::unique_ptr<Package> &new_package);
