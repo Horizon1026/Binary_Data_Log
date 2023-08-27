@@ -100,22 +100,23 @@ std::string BinaryDataLog::LoadStringFromBinaryFile(std::ifstream &log_file,
 }
 
 void BinaryDataLog::ReportAllRegisteredPackages() {
-    ReportInfo("[DataLog] All registered packages:");
+    ReportInfo("[DataLog] Report all registered packages information:");
     for (const auto &pair : packages_id_with_objects_) {
         const auto &package = pair.second;
         ReportInfo(">> Package name : " << package->name);
         ReportInfo("   Package id : " << package->id);
-        ReportInfo("   Package items :");
+        ReportInfo("   Package items : [type | data_index_in_package_data | name]");
         for (const auto &item : package->items) {
-            ReportInfo("      [" << item_type_strings[static_cast<uint32_t>(item.type)] << "] : " << item.name);
+            ReportInfo("      " << item_type_strings[static_cast<uint32_t>(item.type)] << " | " <<
+                item.bindata_index_in_package << " | " << item.name);
         }
     }
 }
 
 void BinaryDataLog::ReportAllLoadedPackages() {
-    ReportInfo("[DataLog] All loaded package:");
+    ReportInfo("[DataLog] Report all loaded packages binary data:");
     for (const auto &package : packages_id_with_data_) {
-        ReportInfo(">> Package id : " << package.first << ", context [ time | index | data ] :");
+        ReportInfo(">> Package id : " << package.first << ", context [ time(ms) | index_in_log_file | bindata ] :");
         for (const auto &data : package.second) {
             ReportText(GREEN "[Info ] " RESET_COLOR "      " << data.timestamp_ms << " | ");
             ReportText(data.index_in_file << " | ");

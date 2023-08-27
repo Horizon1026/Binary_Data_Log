@@ -102,6 +102,7 @@ static std::string binary_log_file_header = "SLAM_DATA_LOG";
 
 struct PackageItemInfo {
     ItemType type = ItemType::kUint32;
+    uint32_t bindata_index_in_package = 0;
     std::string name;
 };
 

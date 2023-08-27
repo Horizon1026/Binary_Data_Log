@@ -72,13 +72,16 @@ bool BinaryDataLog::LoadRegisteredPackages(std::ifstream &log_file) {
         sum_check_byte = SummaryBytes(reinterpret_cast<uint8_t *>(package_ptr->name.data()), package_name_length, sum_check_byte);
 
         uint32_t offset_in_package = 4 + 2 + 1 + package_name_length + 1;
+        uint32_t item_data_index_in_package_data = 0;
         while (offset_in_package < offset_to_next_package) {
             package_ptr->items.emplace_back(PackageItemInfo());
             auto &new_item = package_ptr->items.back();
+            new_item.bindata_index_in_package = item_data_index_in_package_data;
 
             // Load item type.
             log_file.read(reinterpret_cast<char *>(&new_item.type), 1);
             sum_check_byte = SummaryBytes(reinterpret_cast<uint8_t *>(&new_item.type), 1, sum_check_byte);
+            item_data_index_in_package_data += item_type_sizes[static_cast<uint32_t>(new_item.type)];
 
             // Load item name length.
             uint8_t item_name_length = 0;

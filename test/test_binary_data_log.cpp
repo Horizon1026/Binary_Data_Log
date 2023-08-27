@@ -14,11 +14,13 @@ struct ImuData {
     float accel_x = 0.0f;
     float accel_y = 0.0f;
     float accel_z = 0.0f;
+    uint8_t valid = 0;
 };
 
 struct BaroData {
     uint32_t press = 0;
     float height = 0.0f;
+    uint8_t valid = 0;
 };
 
 #pragma pack()
@@ -45,6 +47,7 @@ void TestCreateLog(const std::string &log_file_name) {
         package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kFloat, .name = "accel_x"});
         package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kFloat, .name = "accel_y"});
         package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kFloat, .name = "accel_z"});
+        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kUint8, .name = "valid"});
 
         if (logger.RegisterPackage(package_ptr)) {
             ReportInfo("Register a new package.");
@@ -58,6 +61,7 @@ void TestCreateLog(const std::string &log_file_name) {
         package_ptr->name = "baro";
         package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kUint32, .name = "press"});
         package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kFloat, .name = "height"});
+        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kUint8, .name = "valid"});
 
         if (logger.RegisterPackage(package_ptr)) {
             ReportInfo("Register a new package.");
@@ -77,7 +81,7 @@ void TestCreateLog(const std::string &log_file_name) {
     logger.ReportAllRegisteredPackages();
 
     // Record data.
-    for (uint32_t i = 0; i < 20; ++i) {
+    for (uint32_t i = 0; i < 10; ++i) {
         ImuData imu_data = { static_cast<float>(i) };
         logger.RecordPackage(1, reinterpret_cast<const char *>(&imu_data));
 
