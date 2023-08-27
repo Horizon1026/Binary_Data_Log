@@ -14,7 +14,7 @@
 
 namespace SLAM_DATA_LOG {
 
-struct TimestampedData {
+struct PackageDataPerTick {
     uint32_t timestamp_ms = 0;
     std::vector<uint8_t> data;
     uint32_t index_in_file = 0;
@@ -31,7 +31,7 @@ public:
 
     // Support for recorder.
     bool CreateLogFile(const std::string &log_file_name = "data.binlog");
-    bool RegisterPackage(std::unique_ptr<Package> &new_package);
+    bool RegisterPackage(std::unique_ptr<PackageInfo> &new_package);
     bool PrepareForRecording();
     bool RecordPackage(const uint16_t package_id, const char *data_ptr);
 
@@ -44,12 +44,12 @@ public:
 
     // Const Reference for member variables.
     // Support for decodec.
-    const std::unordered_map<uint16_t, std::unique_ptr<Package>> &packages_id_with_objects() const { return packages_id_with_objects_; }
+    const std::unordered_map<uint16_t, std::unique_ptr<PackageInfo>> &packages_id_with_objects() const { return packages_id_with_objects_; }
     // Support for recorder.
     const std::unique_ptr<std::fstream> &file_ptr() const { return file_ptr_; }
     const std::chrono::time_point<std::chrono::system_clock> &start_system_time() const { return start_system_time_; }
     // Support for decoder.
-    const std::unordered_map<uint16_t, std::vector<TimestampedData>> &packages_id_with_data() const { return packages_id_with_data_; }
+    const std::unordered_map<uint16_t, std::vector<PackageDataPerTick>> &packages_id_with_data() const { return packages_id_with_data_; }
 
 private:
     // Support for decodec.
@@ -71,14 +71,14 @@ private:
 
 private:
     // Support for decodec.
-    std::unordered_map<uint16_t, std::unique_ptr<Package>> packages_id_with_objects_;
+    std::unordered_map<uint16_t, std::unique_ptr<PackageInfo>> packages_id_with_objects_;
 
     // Support for recorder.
     std::unique_ptr<std::fstream> file_ptr_ = nullptr;
     std::chrono::time_point<std::chrono::system_clock> start_system_time_ = std::chrono::system_clock::now();
 
     // Support for decoder.
-    std::unordered_map<uint16_t, std::vector<TimestampedData>> packages_id_with_data_;
+    std::unordered_map<uint16_t, std::vector<PackageDataPerTick>> packages_id_with_data_;
 };
 
 }

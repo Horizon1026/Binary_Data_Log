@@ -100,15 +100,15 @@ static std::vector<std::string> item_type_strings = {
 
 static std::string binary_log_file_header = "SLAM_DATA_LOG";
 
-struct PackageItem {
+struct PackageItemInfo {
     ItemType type = ItemType::kUint32;
     std::string name;
 };
 
-struct Package {
+struct PackageInfo {
     uint16_t id = 0;
     std::string name;
-    std::vector<PackageItem> items;
+    std::vector<PackageItemInfo> items;
     uint32_t size = 0;
 };
 

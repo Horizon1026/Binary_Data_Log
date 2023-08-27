@@ -46,7 +46,7 @@ bool BinaryDataLog::CreateLogFile(const std::string &log_file_name) {
     return true;
 }
 
-bool BinaryDataLog::RegisterPackage(std::unique_ptr<Package> &new_package) {
+bool BinaryDataLog::RegisterPackage(std::unique_ptr<PackageInfo> &new_package) {
     if (new_package == nullptr) {
         ReportError("[DataLog] Package to be registered is empty.");
         return false;
@@ -58,13 +58,13 @@ bool BinaryDataLog::RegisterPackage(std::unique_ptr<Package> &new_package) {
     }
 
     const uint16_t package_id = new_package->id;
-    Package *package_ptr = new_package.get();
+    PackageInfo *package_info_ptr = new_package.get();
     packages_id_with_objects_.insert(std::make_pair(package_id, std::move(new_package)));
 
     // Statis the whole size of binary data in this package.
-    package_ptr->size = 0;
-    for (const auto &item : package_ptr->items) {
-        package_ptr->size += item_type_sizes[static_cast<uint32_t>(item.type)];
+    package_info_ptr->size = 0;
+    for (const auto &item : package_info_ptr->items) {
+        package_info_ptr->size += item_type_sizes[static_cast<uint32_t>(item.type)];
     }
 
     return true;

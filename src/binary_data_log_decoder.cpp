@@ -58,7 +58,7 @@ bool BinaryDataLog::LoadRegisteredPackages(std::ifstream &log_file) {
         offset += offset_to_next_package;
 
         // Load package id.
-        std::unique_ptr<Package> package_ptr = std::make_unique<Package>();
+        std::unique_ptr<PackageInfo> package_ptr = std::make_unique<PackageInfo>();
         log_file.read(reinterpret_cast<char *>(&package_ptr->id), 2);
         sum_check_byte = SummaryBytes(reinterpret_cast<uint8_t *>(&package_ptr->id), 2, sum_check_byte);
 
@@ -73,7 +73,7 @@ bool BinaryDataLog::LoadRegisteredPackages(std::ifstream &log_file) {
 
         uint32_t offset_in_package = 4 + 2 + 1 + package_name_length + 1;
         while (offset_in_package < offset_to_next_package) {
-            package_ptr->items.emplace_back(PackageItem());
+            package_ptr->items.emplace_back(PackageItemInfo());
             auto &new_item = package_ptr->items.back();
 
             // Load item type.
@@ -111,7 +111,7 @@ bool BinaryDataLog::LoadRegisteredPackages(std::ifstream &log_file) {
 
 bool BinaryDataLog::LoadOnePackage(std::ifstream &log_file, bool set_load_data) {
     // Record the index in log file.
-    TimestampedData timestamped_data;
+    PackageDataPerTick timestamped_data;
     timestamped_data.index_in_file = log_file.tellg();
 
     // Load offset to the next content.

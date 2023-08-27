@@ -36,15 +36,15 @@ void TestCreateLog(const std::string &log_file_name) {
 
     // Register new packages.
     {
-        std::unique_ptr<Package> package_ptr = std::make_unique<Package>();
+        std::unique_ptr<PackageInfo> package_ptr = std::make_unique<PackageInfo>();
         package_ptr->id = 1;
         package_ptr->name = "imu";
-        package_ptr->items.emplace_back(PackageItem{.type = ItemType::kFloat, .name = "gyro_x"});
-        package_ptr->items.emplace_back(PackageItem{.type = ItemType::kFloat, .name = "gyro_y"});
-        package_ptr->items.emplace_back(PackageItem{.type = ItemType::kFloat, .name = "gyro_z"});
-        package_ptr->items.emplace_back(PackageItem{.type = ItemType::kFloat, .name = "accel_x"});
-        package_ptr->items.emplace_back(PackageItem{.type = ItemType::kFloat, .name = "accel_y"});
-        package_ptr->items.emplace_back(PackageItem{.type = ItemType::kFloat, .name = "accel_z"});
+        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kFloat, .name = "gyro_x"});
+        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kFloat, .name = "gyro_y"});
+        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kFloat, .name = "gyro_z"});
+        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kFloat, .name = "accel_x"});
+        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kFloat, .name = "accel_y"});
+        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kFloat, .name = "accel_z"});
 
         if (logger.RegisterPackage(package_ptr)) {
             ReportInfo("Register a new package.");
@@ -53,11 +53,11 @@ void TestCreateLog(const std::string &log_file_name) {
         }
     }
     {
-        std::unique_ptr<Package> package_ptr = std::make_unique<Package>();
+        std::unique_ptr<PackageInfo> package_ptr = std::make_unique<PackageInfo>();
         package_ptr->id = 2;
         package_ptr->name = "baro";
-        package_ptr->items.emplace_back(PackageItem{.type = ItemType::kUint32, .name = "press"});
-        package_ptr->items.emplace_back(PackageItem{.type = ItemType::kFloat, .name = "height"});
+        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kUint32, .name = "press"});
+        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kFloat, .name = "height"});
 
         if (logger.RegisterPackage(package_ptr)) {
             ReportInfo("Register a new package.");
