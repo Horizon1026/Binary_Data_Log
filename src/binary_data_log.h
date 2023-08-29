@@ -29,6 +29,9 @@ public:
 
     void CleanUp();
 
+    template <typename T>
+    static T ConvertBytes(const uint8_t *bytes, ItemType type);
+
     // Support for recorder.
     bool CreateLogFile(const std::string &log_file_name = "data.binlog");
     bool RegisterPackage(std::unique_ptr<PackageInfo> &new_package);
@@ -80,6 +83,40 @@ private:
     // Support for decoder.
     std::unordered_map<uint16_t, std::vector<PackageDataPerTick>> packages_id_with_data_;
 };
+
+/* Class BinaryDataLog Definition. */
+template <typename T>
+T BinaryDataLog::ConvertBytes(const uint8_t *bytes, ItemType type) {
+    switch (type) {
+        case ItemType::kUint8: {
+            return static_cast<T>(*bytes);
+        }
+        case ItemType::kInt8: {
+            const SLAM_UTILITY::int8_t *data_ptr = reinterpret_cast<const SLAM_UTILITY::int8_t *>(bytes);
+            return static_cast<T>(*data_ptr);
+        }
+        case ItemType::kUint16: {
+            const SLAM_UTILITY::uint16_t *data_ptr = reinterpret_cast<const SLAM_UTILITY::uint16_t *>(bytes);
+            return static_cast<T>(*data_ptr);
+        }
+        // case ItemType::kInt16:
+        //     return static_cast<T>(*reinterpret_cast<const int16_t *>(bytes));
+        // case ItemType::kUint32:
+        //     return static_cast<T>(*reinterpret_cast<const uint32_t *>(bytes));
+        // case ItemType::kInt32:
+        //     return static_cast<T>(*reinterpret_cast<const int32_t *>(bytes));
+        // case ItemType::kUint64:
+        //     return static_cast<T>(*reinterpret_cast<const uint64_t *>(bytes));
+        // case ItemType::kInt64:
+        //     return static_cast<T>(*reinterpret_cast<const int64_t *>(bytes));
+        // case ItemType::kFloat:
+        //     return static_cast<T>(*reinterpret_cast<const float *>(bytes));
+        // case ItemType::kDouble:
+        //     return static_cast<T>(*reinterpret_cast<const double *>(bytes));
+        default:
+            return static_cast<T>(0);
+    }
+}
 
 }
 
