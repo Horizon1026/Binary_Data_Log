@@ -99,20 +99,34 @@ T BinaryDataLog::ConvertBytes(const uint8_t *bytes, ItemType type) {
             const SLAM_UTILITY::uint16_t *data_ptr = reinterpret_cast<const SLAM_UTILITY::uint16_t *>(bytes);
             return static_cast<T>(*data_ptr);
         }
-        // case ItemType::kInt16:
-        //     return static_cast<T>(*reinterpret_cast<const int16_t *>(bytes));
-        // case ItemType::kUint32:
-        //     return static_cast<T>(*reinterpret_cast<const uint32_t *>(bytes));
-        // case ItemType::kInt32:
-        //     return static_cast<T>(*reinterpret_cast<const int32_t *>(bytes));
-        // case ItemType::kUint64:
-        //     return static_cast<T>(*reinterpret_cast<const uint64_t *>(bytes));
-        // case ItemType::kInt64:
-        //     return static_cast<T>(*reinterpret_cast<const int64_t *>(bytes));
-        // case ItemType::kFloat:
-        //     return static_cast<T>(*reinterpret_cast<const float *>(bytes));
-        // case ItemType::kDouble:
-        //     return static_cast<T>(*reinterpret_cast<const double *>(bytes));
+        case ItemType::kInt16: {
+            const SLAM_UTILITY::int16_t *data_ptr = reinterpret_cast<const SLAM_UTILITY::int16_t *>(bytes);
+            return static_cast<T>(*data_ptr);
+        }
+        case ItemType::kUint32: {
+            const SLAM_UTILITY::uint32_t *data_ptr = reinterpret_cast<const SLAM_UTILITY::uint32_t *>(bytes);
+            return static_cast<T>(*data_ptr);
+        }
+        case ItemType::kInt32: {
+            const SLAM_UTILITY::int32_t *data_ptr = reinterpret_cast<const SLAM_UTILITY::int32_t *>(bytes);
+            return static_cast<T>(*data_ptr);
+        }
+        case ItemType::kUint64: {
+            const SLAM_UTILITY::uint64_t *data_ptr = reinterpret_cast<const SLAM_UTILITY::uint64_t *>(bytes);
+            return static_cast<T>(*data_ptr);
+        }
+        case ItemType::kInt64: {
+            const SLAM_UTILITY::int64_t *data_ptr = reinterpret_cast<const SLAM_UTILITY::int64_t *>(bytes);
+            return static_cast<T>(*data_ptr);
+        }
+        case ItemType::kFloat: {
+            const float *data_ptr = reinterpret_cast<const float *>(bytes);
+            return static_cast<T>(*data_ptr);
+        }
+        case ItemType::kDouble: {
+            const double *data_ptr = reinterpret_cast<const double *>(bytes);
+            return static_cast<T>(*data_ptr);
+        }
         default:
             return static_cast<T>(0);
     }
