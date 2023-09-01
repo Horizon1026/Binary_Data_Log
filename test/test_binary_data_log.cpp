@@ -81,11 +81,24 @@ void TestCreateLog(const std::string &log_file_name) {
     logger.ReportAllRegisteredPackages();
 
     // Record data.
-    for (uint32_t i = 0; i < 10; ++i) {
-        ImuData imu_data = { static_cast<float>(i) };
+    for (uint32_t i = 0; i < 100; ++i) {
+        const float temp = static_cast<float>(i) / 15.0f;
+        ImuData imu_data {
+            .gyro_x = std::sin(temp + 0.34f),
+            .gyro_y = std::sin(temp + 1.5f),
+            .gyro_z = std::sin(temp + 1.0f),
+            .accel_x = std::sin(temp),
+            .accel_y = std::sin(temp + 0.05f),
+            .accel_z = std::sin(temp + 0.6f),
+            .valid = i > 50,
+        };
         logger.RecordPackage(1, reinterpret_cast<const char *>(&imu_data));
 
-        BaroData baro_data = { i };
+        BaroData baro_data {
+            .press = i * 2,
+            .height = static_cast<float>(i * i),
+            .valid = i < 30,
+        };
         logger.RecordPackage(2, reinterpret_cast<const char *>(&baro_data));
 
         usleep(10000);
