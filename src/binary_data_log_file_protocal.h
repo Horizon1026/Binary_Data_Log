@@ -114,9 +114,15 @@ struct PackageItemInfo {
 
 struct PackageInfo {
     uint16_t id = 0;
+    uint32_t size = 0;
     std::string name;
     std::vector<PackageItemInfo> items;
-    uint32_t size = 0;
+};
+
+struct PackageDataPerTick {
+    float timestamp_ms = 0.0f;
+    std::vector<uint8_t> data;
+    uint32_t index_in_file = 0;
 };
 
 }

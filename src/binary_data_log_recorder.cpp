@@ -102,7 +102,7 @@ bool BinaryDataLog::RecordPackage(const uint16_t package_id,
     // Write the system timestamp.
     std::chrono::time_point<std::chrono::system_clock> new_time_point = std::chrono::system_clock::now();
     std::chrono::duration<float> elapsed_seconds = new_time_point - start_system_time_;
-    const uint32_t timestamp = static_cast<uint32_t>(elapsed_seconds.count() * 1e3f);
+    const float timestamp = static_cast<float>(elapsed_seconds.count() * 1e3f);
     file_ptr_->write(reinterpret_cast<const char *>(&timestamp), 4);
     sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&timestamp), 4, sum_check_byte);
 

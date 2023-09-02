@@ -14,12 +14,6 @@
 
 namespace SLAM_DATA_LOG {
 
-struct PackageDataPerTick {
-    uint32_t timestamp_ms = 0;
-    std::vector<uint8_t> data;
-    uint32_t index_in_file = 0;
-};
-
 /* Class BinaryDataLog Declaration. */
 class BinaryDataLog {
 

@@ -23,7 +23,8 @@ bool BinaryDataLog::LoadLogFile(const std::string &log_file_name, bool set_load_
         BREAK_IF(!LoadOnePackage(log_file, set_load_data));
     }
 
-    return true;
+    // If the whole log file is loaded, it means success.
+    return log_file.eof();
 }
 
 bool BinaryDataLog::CheckLogFileHeader(std::ifstream &log_file) {
