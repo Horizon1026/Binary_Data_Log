@@ -48,6 +48,9 @@ bool BinaryDataLog::LoadRegisteredPackages(std::ifstream &log_file) {
     uint32_t offset_to_data_part = 0;
     log_file.read(reinterpret_cast<char *>(&offset_to_data_part), 4);
 
+    // Check if this is the end of log file.
+    RETURN_FALSE_IF(log_file.eof());
+
     // Load information of all registered packages.
     uint32_t offset = 4 + 1;
     while (offset < offset_to_data_part) {
