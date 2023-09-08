@@ -176,10 +176,4 @@ bool BinaryDataLog::LoadOnePackage(std::ifstream &log_file, bool set_load_data) 
     return true;
 }
 
-
-bool BinaryDataLog::PreloadOnePackage(std::ifstream &log_file) {
-    // TODO:
-    return true;
-}
-
 }

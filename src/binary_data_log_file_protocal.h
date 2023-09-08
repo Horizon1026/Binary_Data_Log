@@ -64,10 +64,6 @@ enum class ItemType : uint8_t {
     kInt64 = 7,
     kFloat = 8,
     kDouble = 9,
-    kImageU8C1 = 10,
-    kImageU8C3 = 11,
-    kPointCloud2D = 12,
-    kPointCloud3D = 13,
 };
 
 static std::vector<uint32_t> item_type_sizes = {
@@ -81,10 +77,6 @@ static std::vector<uint32_t> item_type_sizes = {
     8,  // kInt64.
     4,  // kFloat.
     8,  // kDouble.
-    0,  // kImageU8C1.
-    0,  // kImageU8C3.
-    0,  // kPointCloud2D.
-    0,  // kPointCloud3D.
 };
 
 static std::vector<std::string> item_type_strings = {
@@ -98,10 +90,6 @@ static std::vector<std::string> item_type_strings = {
     "kInt64",
     "kFloat",
     "kDouble",
-    "kImageU8C1",
-    "kImageU8C3",
-    "kPointCloud2D",
-    "kPointCloud3D",
 };
 
 static std::string binary_log_file_header = "SLAM_DATA_LOG";

@@ -64,7 +64,6 @@ private:
     bool CheckLogFileHeader(std::ifstream &log_file);
     bool LoadRegisteredPackages(std::ifstream &log_file);
     bool LoadOnePackage(std::ifstream &log_file, bool set_load_data = true);
-    bool PreloadOnePackage(std::ifstream &log_file);
 
 private:
     // Support for decodec.
