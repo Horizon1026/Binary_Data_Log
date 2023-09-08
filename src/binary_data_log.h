@@ -2,6 +2,7 @@
 #define _BINARY_DATA_LOG_H_
 
 #include "binary_data_log_file_protocal.h"
+#include "datatype_image.h"
 
 #include "iostream"
 #include "fstream"
@@ -31,6 +32,8 @@ public:
     bool RegisterPackage(std::unique_ptr<PackageInfo> &new_package);
     bool PrepareForRecording();
     bool RecordPackage(const uint16_t package_id, const char *data_ptr);
+    bool RecordPackage(const uint16_t package_id, const GrayImage &image);
+    bool RecordPackage(const uint16_t package_id, const RgbImage &image);
 
     // Support for decoder.
     bool LoadLogFile(const std::string &log_file_name, bool set_load_data = true);
@@ -59,6 +62,7 @@ private:
     // Support for recorder.
     void WriteLogFileHeader();
     bool RecordAllRegisteredPackages();
+    bool RecordImage(const uint16_t package_id, const uint8_t channels, const int32_t image_rows, const int32_t image_cols, const uint8_t *data_ptr);
 
     // Support for decoder.
     bool CheckLogFileHeader(std::ifstream &log_file);

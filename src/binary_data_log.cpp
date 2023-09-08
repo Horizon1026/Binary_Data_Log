@@ -48,17 +48,35 @@ bool BinaryDataLog::CreateLogFile(const std::string &log_file_name) {
 
 bool BinaryDataLog::RegisterPackage(std::unique_ptr<PackageInfo> &new_package) {
     if (new_package == nullptr) {
-        ReportError("[DataLog] Package to be registered is empty.");
+        ReportError("[DataLog] Package to be registered is invalid.");
         return false;
     }
 
+    PackageInfo *package_info_ptr = new_package.get();
+    // Registering will be failed if there is no items in this package.
+    if (package_info_ptr->items.empty()) {
+        ReportError("[DataLog] Package to be registered has no items.");
+        return false;
+    }
+
+    // If one of items in package is image, this package should only have one item.
+    if (package_info_ptr->items.size() > 1) {
+        for (const auto &item : package_info_ptr->items) {
+            if (item.type > ItemType::kDouble) {
+                ReportError("[DataLog] If one of items in package is image, this package should only have one item.");
+                return false;
+            }
+        }
+    }
+
+    // Do not repeat registering the same package.
     if (packages_id_with_objects_.find(new_package->id) != packages_id_with_objects_.end()) {
         ReportError("[DataLog] Package to be registered is exist now.");
         return false;
     }
 
+    // Register this package.
     const uint16_t package_id = new_package->id;
-    PackageInfo *package_info_ptr = new_package.get();
     packages_id_with_objects_.insert(std::make_pair(package_id, std::move(new_package)));
 
     // Statis the whole size of binary data in this package.

@@ -47,6 +47,19 @@ for each package:
     [10] - [n]: Binary data.
     [n + 1]: Sum check byte of this package.
 
+for each image package:
+    [0] - [3]: Offset index to the next 'package_content',
+        which means the length of this 'package_content',
+        and including the checking byte.
+    [4] - [5]: Package id.
+    [6] - [9]: System timestamp of this package content. Unit is millisecond.
+
+    [10]: Channels.
+    [11] - [12]: Image rows(height).
+    [13] - [14]: Image cols(width).
+    [15] - [n]: Binary data.
+    [n + 1]: Sum check byte of this package.
+
 */
 
 using namespace SLAM_UTILITY;
@@ -64,6 +77,7 @@ enum class ItemType : uint8_t {
     kInt64 = 7,
     kFloat = 8,
     kDouble = 9,
+    kImage = 10,
 };
 
 static std::vector<uint32_t> item_type_sizes = {
@@ -77,6 +91,7 @@ static std::vector<uint32_t> item_type_sizes = {
     8,  // kInt64.
     4,  // kFloat.
     8,  // kDouble.
+    0,  // kImage.
 };
 
 static std::vector<std::string> item_type_strings = {
@@ -90,6 +105,7 @@ static std::vector<std::string> item_type_strings = {
     "kInt64",
     "kFloat",
     "kDouble",
+    "kImage",
 };
 
 static std::string binary_log_file_header = "SLAM_DATA_LOG";
