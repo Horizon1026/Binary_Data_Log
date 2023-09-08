@@ -6,8 +6,11 @@
 namespace SLAM_DATA_LOG {
 
 BinaryDataLog::~BinaryDataLog() {
-    if (file_ptr_ != nullptr) {
-        file_ptr_->close();
+    if (file_w_ptr_ != nullptr) {
+        file_w_ptr_->close();
+    }
+    if (file_r_ptr_ != nullptr) {
+        file_r_ptr_->close();
     }
 }
 
@@ -16,10 +19,10 @@ void BinaryDataLog::CleanUp() {
     packages_id_with_objects_.clear();
 
     // Support for recorder.
-    if (file_ptr_ != nullptr) {
-        file_ptr_->close();
+    if (file_w_ptr_ != nullptr) {
+        file_w_ptr_->close();
     }
-    file_ptr_ = nullptr;
+    file_w_ptr_ = nullptr;
     start_system_time_ = std::chrono::system_clock::now();
 
     // Support for decoder.
@@ -28,14 +31,14 @@ void BinaryDataLog::CleanUp() {
 
 bool BinaryDataLog::CreateLogFile(const std::string &log_file_name) {
     // If last log file is not closed, close it.
-    if (file_ptr_ != nullptr) {
-        file_ptr_->close();
-        file_ptr_.reset();
+    if (file_w_ptr_ != nullptr) {
+        file_w_ptr_->close();
+        file_w_ptr_.reset();
     }
 
     // Try to create new log file.
-    file_ptr_ = std::make_unique<std::fstream>(log_file_name, std::ios::out | std::ios::binary);
-    if (!file_ptr_->is_open()) {
+    file_w_ptr_ = std::make_unique<std::fstream>(log_file_name, std::ios::out | std::ios::binary);
+    if (!file_w_ptr_->is_open()) {
         ReportError("[DataLog] Cannot create log file : " << log_file_name);
         return false;
     }
@@ -94,7 +97,7 @@ bool BinaryDataLog::PrepareForRecording() {
 }
 
 void BinaryDataLog::WriteLogFileHeader() {
-    file_ptr_->write(binary_log_file_header.c_str(), binary_log_file_header.size());
+    file_w_ptr_->write(binary_log_file_header.c_str(), binary_log_file_header.size());
 }
 
 uint8_t BinaryDataLog::SummaryBytes(const uint8_t *byte_ptr, const uint32_t size, const uint8_t init_value) {
@@ -105,10 +108,9 @@ uint8_t BinaryDataLog::SummaryBytes(const uint8_t *byte_ptr, const uint32_t size
     return value;
 }
 
-std::string BinaryDataLog::LoadStringFromBinaryFile(std::ifstream &log_file,
-                                                    uint32_t size) {
+std::string BinaryDataLog::LoadStringFromBinaryFile(uint32_t size) {
     char *buffer = new char[size + 1];
-    log_file.read(buffer, size);
+    file_r_ptr_->read(buffer, size);
     buffer[size] = '\0';
 
     std::string str(buffer);
@@ -134,13 +136,45 @@ void BinaryDataLog::ReportAllRegisteredPackages() {
 void BinaryDataLog::ReportAllLoadedPackages() {
     ReportInfo("[DataLog] Report all loaded packages binary data:");
     for (const auto &package : packages_id_with_data_) {
+        const auto it = packages_id_with_objects_.find(package.first);
+        if (it == packages_id_with_objects_.end()) {
+            ReportError("[DataLog] packages_id_with_data_ is not matching with packages_id_with_objects_.");
+            return;
+        }
+
+        const auto &items_info = it->second->items;
+        if (items_info.empty()) {
+            ReportError("[DataLog] Package with id " << it->first << " has no items.");
+            return;
+        }
+
+        const auto &first_item_type = items_info.front().type;
+
         ReportInfo(">> Package id : " << package.first << ", context [ time(ms) | index_in_log_file | bindata ] :");
-        for (const auto &data : package.second) {
-            ReportText(GREEN "[Info ] " RESET_COLOR "      " << data.timestamp_ms << " | ");
-            ReportText(data.index_in_file << " | ");
-            for (const uint8_t &byte : data.data) {
-                ReportText(static_cast<int32_t>(byte) << " ");
+        for (const auto &package_data_per_tick : package.second) {
+            ReportText(GREEN "[Info ] " RESET_COLOR "      " << package_data_per_tick.timestamp_ms << " | ");
+            ReportText(package_data_per_tick.index_in_file << " | ");
+
+            switch (first_item_type) {
+                case ItemType::kImage: {
+                    if (package_data_per_tick.data.size() >= 5) {
+                        const uint8_t *channel_ptr = reinterpret_cast<const uint8_t *>(&package_data_per_tick.data[0]);
+                        const uint16_t *rows_ptr = reinterpret_cast<const uint16_t *>(&package_data_per_tick.data[1]);
+                        const uint16_t *cols_ptr = reinterpret_cast<const uint16_t *>(&package_data_per_tick.data[3]);
+                        ReportText("channel " << static_cast<uint32_t>(*channel_ptr) << ", rows " << *rows_ptr << ", cols " <<
+                            *cols_ptr);
+                    }
+                    break;
+                }
+
+                default: {
+                    for (const uint8_t &byte : package_data_per_tick.data) {
+                        ReportText(static_cast<int32_t>(byte) << " ");
+                    }
+                    break;
+                }
             }
+
             ReportText(std::endl);
         }
     }

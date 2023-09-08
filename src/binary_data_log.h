@@ -24,9 +24,6 @@ public:
 
     void CleanUp();
 
-    template <typename T>
-    static T ConvertBytes(const uint8_t *bytes, ItemType type);
-
     // Support for recorder.
     bool CreateLogFile(const std::string &log_file_name = "data.binlog");
     bool RegisterPackage(std::unique_ptr<PackageInfo> &new_package);
@@ -37,6 +34,8 @@ public:
 
     // Support for decoder.
     bool LoadLogFile(const std::string &log_file_name, bool set_load_data = true);
+    template <typename T> static T ConvertBytes(const uint8_t *bytes, ItemType type);
+    uint8_t *LoadBinaryDataFromLogFile(uint32_t index_in_file, uint32_t size);
 
     // Support for information.
     void ReportAllRegisteredPackages();
@@ -46,7 +45,7 @@ public:
     // Support for decodec.
     const std::unordered_map<uint16_t, std::unique_ptr<PackageInfo>> &packages_id_with_objects() const { return packages_id_with_objects_; }
     // Support for recorder.
-    const std::unique_ptr<std::fstream> &file_ptr() const { return file_ptr_; }
+    const std::unique_ptr<std::fstream> &file_ptr() const { return file_w_ptr_; }
     const std::chrono::time_point<std::chrono::system_clock> &start_system_time() const { return start_system_time_; }
     // Support for decoder.
     const std::unordered_map<uint16_t, std::vector<PackageDataPerTick>> &packages_id_with_data() const { return packages_id_with_data_; }
@@ -56,25 +55,36 @@ private:
     uint8_t SummaryBytes(const uint8_t *byte_ptr,
                          const uint32_t size,
                          const uint8_t init_value);
-    std::string LoadStringFromBinaryFile(std::ifstream &log_file,
-                                         uint32_t size);
+    std::string LoadStringFromBinaryFile(uint32_t size);
 
     // Support for recorder.
     void WriteLogFileHeader();
     bool RecordAllRegisteredPackages();
-    bool RecordImage(const uint16_t package_id, const uint8_t channels, const int32_t image_rows, const int32_t image_cols, const uint8_t *data_ptr);
+    float GetSystemTimestamp();
+    bool RecordImage(const uint16_t package_id, const int32_t channels, const int32_t image_rows, const int32_t image_cols, const uint8_t *data_ptr);
 
     // Support for decoder.
-    bool CheckLogFileHeader(std::ifstream &log_file);
-    bool LoadRegisteredPackages(std::ifstream &log_file);
-    bool LoadOnePackage(std::ifstream &log_file, bool set_load_data = true);
+    bool CheckLogFileHeader();
+    bool LoadRegisteredPackages();
+    bool LoadOnePackage(bool set_load_data = true);
+    bool LoadOnePackageWithStaticSize(uint8_t &sum_check_byte,
+                                      PackageDataPerTick &timestamped_data,
+                                      uint16_t package_id,
+                                      uint32_t data_size,
+                                      bool set_load_data);
+    bool LoadOnePackageWithDynamicSize(PackageInfo &package_info,
+                                       uint8_t &sum_check_byte,
+                                       PackageDataPerTick &timestamped_data,
+                                       uint16_t package_id,
+                                       bool set_load_data);
 
 private:
     // Support for decodec.
+    std::unique_ptr<std::ifstream> file_r_ptr_ = nullptr;
     std::unordered_map<uint16_t, std::unique_ptr<PackageInfo>> packages_id_with_objects_;
 
     // Support for recorder.
-    std::unique_ptr<std::fstream> file_ptr_ = nullptr;
+    std::unique_ptr<std::fstream> file_w_ptr_ = nullptr;
     std::chrono::time_point<std::chrono::system_clock> start_system_time_ = std::chrono::system_clock::now();
 
     // Support for decoder.

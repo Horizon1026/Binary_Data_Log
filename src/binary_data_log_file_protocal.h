@@ -58,6 +58,7 @@ for each image package:
     [11] - [12]: Image rows(height).
     [13] - [14]: Image cols(width).
     [15] - [n]: Binary data.
+
     [n + 1]: Sum check byte of this package.
 
 */
@@ -126,7 +127,7 @@ struct PackageInfo {
 struct PackageDataPerTick {
     float timestamp_ms = 0.0f;
     std::vector<uint8_t> data;
-    uint32_t index_in_file = 0;
+    uint32_t index_in_file = 0; // Start at 'offset'.
 };
 
 }
