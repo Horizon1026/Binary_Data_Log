@@ -23,6 +23,8 @@ public:
     virtual ~BinaryDataLog();
 
     void CleanUp();
+    static bool IsDynamicType(uint8_t type_code);
+    static bool IsDynamicType(ItemType type);
 
     // Support for recorder.
     bool CreateLogFile(const std::string &log_file_name = "data.binlog");
@@ -33,7 +35,7 @@ public:
     bool RecordPackage(const uint16_t package_id, const RgbImage &image);
 
     // Support for decoder.
-    bool LoadLogFile(const std::string &log_file_name, bool set_load_data = true);
+    bool LoadLogFile(const std::string &log_file_name, bool load_dynamic_data = true);
     template <typename T> static T ConvertBytes(const uint8_t *bytes, ItemType type);
     uint8_t *LoadBinaryDataFromLogFile(uint32_t index_in_file, uint32_t size);
 
@@ -43,9 +45,10 @@ public:
 
     // Const Reference for member variables.
     // Support for decodec.
+    const std::unique_ptr<std::ifstream> &file_r_ptr() const { return file_r_ptr_; }
     const std::unordered_map<uint16_t, std::unique_ptr<PackageInfo>> &packages_id_with_objects() const { return packages_id_with_objects_; }
     // Support for recorder.
-    const std::unique_ptr<std::fstream> &file_ptr() const { return file_w_ptr_; }
+    const std::unique_ptr<std::fstream> &file_w_ptr() const { return file_w_ptr_; }
     const std::chrono::time_point<std::chrono::system_clock> &start_system_time() const { return start_system_time_; }
     // Support for decoder.
     const std::unordered_map<uint16_t, std::vector<PackageDataPerTick>> &packages_id_with_data() const { return packages_id_with_data_; }
@@ -66,17 +69,17 @@ private:
     // Support for decoder.
     bool CheckLogFileHeader();
     bool LoadRegisteredPackages();
-    bool LoadOnePackage(bool set_load_data = true);
+    bool LoadOnePackage(bool load_dynamic_data = true);
     bool LoadOnePackageWithStaticSize(uint8_t &sum_check_byte,
                                       PackageDataPerTick &timestamped_data,
                                       uint16_t package_id,
                                       uint32_t data_size,
-                                      bool set_load_data);
+                                      bool load_dynamic_data);
     bool LoadOnePackageWithDynamicSize(PackageInfo &package_info,
                                        uint8_t &sum_check_byte,
                                        PackageDataPerTick &timestamped_data,
                                        uint16_t package_id,
-                                       bool set_load_data);
+                                       bool load_dynamic_data);
 
 private:
     // Support for decodec.

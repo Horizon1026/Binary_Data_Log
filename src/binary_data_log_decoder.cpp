@@ -7,17 +7,18 @@ namespace SLAM_DATA_LOG {
 
 uint8_t *BinaryDataLog::LoadBinaryDataFromLogFile(uint32_t index_in_file, uint32_t size) {
     if (file_r_ptr_ == nullptr) {
+        ReportError("[DataLog] file_r_ptr_ is nullptr.");
         return nullptr;
     }
 
-    uint8_t *buff = (uint8_t *)SlamMemory::Malloc(size);
+    uint8_t *buff = new uint8_t[size];
     file_r_ptr_->seekg(index_in_file, std::ios::beg);
     file_r_ptr_->read(reinterpret_cast<char *>(buff), size);
 
     return buff;
 }
 
-bool BinaryDataLog::LoadLogFile(const std::string &log_file_name, bool set_load_data) {
+bool BinaryDataLog::LoadLogFile(const std::string &log_file_name, bool load_dynamic_data) {
     // If last log file is not closed, close it.
     if (file_r_ptr_ != nullptr) {
         file_r_ptr_->close();
@@ -33,17 +34,20 @@ bool BinaryDataLog::LoadLogFile(const std::string &log_file_name, bool set_load_
 
     // Check header.
     RETURN_FALSE_IF_FALSE(CheckLogFileHeader());
-
     // Load all registered packages information.
     RETURN_FALSE_IF_FALSE(LoadRegisteredPackages());
-
     // Load all data.
     while (1) {
-        BREAK_IF(!LoadOnePackage(set_load_data));
+        BREAK_IF(!LoadOnePackage(load_dynamic_data));
     }
 
     // If the whole log file is loaded, it means success.
-    return file_r_ptr_->eof();
+    const bool res = file_r_ptr_->eof();
+
+    // Reopen this log file. If not do this, the belowing 'LoadBinaryDataFromLogFile' will make error.
+    file_r_ptr_->close();
+    file_r_ptr_ = std::make_unique<std::ifstream>(log_file_name, std::ios::in | std::ios::binary);
+    return res;
 }
 
 bool BinaryDataLog::CheckLogFileHeader() {
@@ -135,7 +139,7 @@ bool BinaryDataLog::LoadRegisteredPackages() {
     return true;
 }
 
-bool BinaryDataLog::LoadOnePackage(bool set_load_data) {
+bool BinaryDataLog::LoadOnePackage(bool load_dynamic_data) {
     // Record the index in log file.
     PackageDataPerTick timestamped_data;
     timestamped_data.index_in_file = file_r_ptr_->tellg();
@@ -144,6 +148,7 @@ bool BinaryDataLog::LoadOnePackage(bool set_load_data) {
     uint32_t offset_to_next_content = 0;
     file_r_ptr_->read(reinterpret_cast<char *>(&offset_to_next_content), 4);
     uint8_t sum_check_byte = SummaryBytes(reinterpret_cast<uint8_t *>(&offset_to_next_content), 4, 0);
+    timestamped_data.size_of_all_in_file = offset_to_next_content;
 
     // Check if this is the end of log file.
     RETURN_FALSE_IF(file_r_ptr_->eof());
@@ -169,10 +174,10 @@ bool BinaryDataLog::LoadOnePackage(bool set_load_data) {
     const uint32_t data_size = it->second->size;
     if (data_size == 0) {
         RETURN_FALSE_IF_FALSE(LoadOnePackageWithDynamicSize(*(it->second),
-            sum_check_byte, timestamped_data, package_id, set_load_data));
+            sum_check_byte, timestamped_data, package_id, load_dynamic_data));
     } else {
         RETURN_FALSE_IF_FALSE(LoadOnePackageWithStaticSize(sum_check_byte,
-            timestamped_data, package_id, data_size, set_load_data));
+            timestamped_data, package_id, data_size, true));
     }
 
     // Locate to the position of next package.
@@ -186,7 +191,7 @@ bool BinaryDataLog::LoadOnePackageWithStaticSize(uint8_t &sum_check_byte,
                                                  PackageDataPerTick &timestamped_data,
                                                  uint16_t package_id,
                                                  uint32_t data_size,
-                                                 bool set_load_data) {
+                                                 bool load_dynamic_data) {
     char *buffer = new char[data_size];
     file_r_ptr_->read(buffer, data_size);
     sum_check_byte = SummaryBytes(reinterpret_cast<uint8_t *>(buffer), data_size, sum_check_byte);
@@ -204,7 +209,7 @@ bool BinaryDataLog::LoadOnePackageWithStaticSize(uint8_t &sum_check_byte,
     auto &packages = packages_id_with_data_[package_id];
     packages.emplace_back(timestamped_data);
 
-    if (set_load_data) {
+    if (load_dynamic_data) {
         packages.back().data.reserve(data_size);
         for (uint32_t i = 0; i < data_size; ++i) {
             packages.back().data.emplace_back(buffer[i]);
@@ -219,7 +224,7 @@ bool BinaryDataLog::LoadOnePackageWithDynamicSize(PackageInfo &package_info,
                                                   uint8_t &sum_check_byte,
                                                   PackageDataPerTick &timestamped_data,
                                                   uint16_t package_id,
-                                                  bool set_load_data) {
+                                                  bool load_dynamic_data) {
     RETURN_FALSE_IF(package_info.items.empty());
 
     // Compute data size in different type.
@@ -261,7 +266,7 @@ bool BinaryDataLog::LoadOnePackageWithDynamicSize(PackageInfo &package_info,
     auto &packages = packages_id_with_data_[package_id];
     packages.emplace_back(timestamped_data);
 
-    if (set_load_data) {
+    if (load_dynamic_data) {
         packages.back().data.reserve(data_size);
         for (uint32_t i = 0; i < data_size; ++i) {
             packages.back().data.emplace_back(buffer[i]);

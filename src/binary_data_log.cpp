@@ -29,6 +29,14 @@ void BinaryDataLog::CleanUp() {
     packages_id_with_data_.clear();
 }
 
+bool BinaryDataLog::IsDynamicType(uint8_t type_code) {
+    return type_code > static_cast<uint8_t>(ItemType::kDouble);
+}
+
+bool BinaryDataLog::IsDynamicType(ItemType type) {
+    return type > ItemType::kDouble;
+}
+
 bool BinaryDataLog::CreateLogFile(const std::string &log_file_name) {
     // If last log file is not closed, close it.
     if (file_w_ptr_ != nullptr) {
@@ -150,10 +158,11 @@ void BinaryDataLog::ReportAllLoadedPackages() {
 
         const auto &first_item_type = items_info.front().type;
 
-        ReportInfo(">> Package id : " << package.first << ", context [ time(ms) | index_in_log_file | bindata ] :");
+        ReportInfo(">> Package id : " << package.first << ", context [ time(ms) | index_in_log_file | size_of_all_in_file | bindata ] :");
         for (const auto &package_data_per_tick : package.second) {
             ReportText(GREEN "[Info ] " RESET_COLOR "      " << package_data_per_tick.timestamp_ms << " | ");
             ReportText(package_data_per_tick.index_in_file << " | ");
+            ReportText(package_data_per_tick.size_of_all_in_file << " | ");
 
             switch (first_item_type) {
                 case ItemType::kImage: {
