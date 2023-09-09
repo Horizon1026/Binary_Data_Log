@@ -135,6 +135,13 @@ void TestCreateLog(const std::string &log_file_name) {
     // Report all registered packages.
     logger.ReportAllRegisteredPackages();
 
+    // Record image.
+    std::vector<std::string> image_filenames;
+    RETURN_IF(!GetFilesInPath("../example/", image_filenames));
+    std::sort(image_filenames.begin(), image_filenames.end());
+    const uint32_t max_idx_of_image_file = image_filenames.size();
+    uint32_t idx_of_image_file = 0;
+
     // Record data.
     for (uint32_t i = 0; i < 200; ++i) {
         const float temp = static_cast<float>(i) / 15.0f;
@@ -156,21 +163,19 @@ void TestCreateLog(const std::string &log_file_name) {
         };
         logger.RecordPackage(2, reinterpret_cast<const char *>(&baro_data));
 
+        if (i % (200 / max_idx_of_image_file) == 0 && idx_of_image_file < max_idx_of_image_file) {
+            GrayImage gray_image;
+            Visualizor::LoadImage(image_filenames[idx_of_image_file], gray_image);
+            logger.RecordPackage(3, gray_image);
+
+            RgbImage rgb_image;
+            Visualizor::LoadImage(image_filenames[idx_of_image_file], rgb_image);
+            logger.RecordPackage(4, rgb_image);
+
+            ++idx_of_image_file;
+        }
+
         usleep(10000);
-    }
-
-    // Record image.
-    std::vector<std::string> image_filenames;
-    RETURN_IF(!GetFilesInPath("../example/", image_filenames));
-    std::sort(image_filenames.begin(), image_filenames.end());
-    for (const auto &image_filename : image_filenames) {
-        GrayImage gray_image;
-        Visualizor::LoadImage(image_filename, gray_image);
-        logger.RecordPackage(3, gray_image);
-
-        RgbImage rgb_image;
-        Visualizor::LoadImage(image_filename, rgb_image);
-        logger.RecordPackage(4, rgb_image);
     }
 }
 
