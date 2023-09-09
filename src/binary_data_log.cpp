@@ -142,7 +142,8 @@ void BinaryDataLog::ReportAllRegisteredPackages() {
 }
 
 void BinaryDataLog::ReportAllLoadedPackages() {
-    ReportInfo("[DataLog] Report all loaded packages binary data:");
+    ReportInfo("[DataLog] Report all loaded packages binary data between " << timestamp_s_range_of_loaded_log_.first <<
+        "s to " << timestamp_s_range_of_loaded_log_.second << "s:");
     for (const auto &package : packages_id_with_data_) {
         const auto it = packages_id_with_objects_.find(package.first);
         if (it == packages_id_with_objects_.end()) {
@@ -160,7 +161,7 @@ void BinaryDataLog::ReportAllLoadedPackages() {
 
         ReportInfo(">> Package id : " << package.first << ", context [ time(ms) | index_in_log_file | size_of_all_in_file | bindata ] :");
         for (const auto &package_data_per_tick : package.second) {
-            ReportText(GREEN "[Info ] " RESET_COLOR "      " << package_data_per_tick.timestamp_ms << " | ");
+            ReportText(GREEN "[Info ] " RESET_COLOR "      " << package_data_per_tick.timestamp_s << " | ");
             ReportText(package_data_per_tick.index_in_file << " | ");
             ReportText(package_data_per_tick.size_of_all_in_file << " | ");
 

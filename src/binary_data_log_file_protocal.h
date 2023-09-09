@@ -125,7 +125,7 @@ struct PackageInfo {
 };
 
 struct PackageDataPerTick {
-    float timestamp_ms = 0.0f;
+    float timestamp_s = 0.0f;
     std::vector<uint8_t> data;  // Binary data stored in bytes.
     uint32_t index_in_file = 0; // Start at 'offset'.
     uint32_t size_of_all_in_file = 0;  // Including offset, id, timestamp, binary_data, check_byte.

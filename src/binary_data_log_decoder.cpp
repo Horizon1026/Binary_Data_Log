@@ -37,6 +37,7 @@ bool BinaryDataLog::LoadLogFile(const std::string &log_file_name, bool load_dyna
     // Load all registered packages information.
     RETURN_FALSE_IF_FALSE(LoadRegisteredPackages());
     // Load all data.
+    timestamp_s_range_of_loaded_log_ = std::make_pair(INFINITY, -INFINITY);
     while (1) {
         BREAK_IF(!LoadOnePackage(load_dynamic_data));
     }
@@ -167,8 +168,11 @@ bool BinaryDataLog::LoadOnePackage(bool load_dynamic_data) {
     }
 
     // Load system timestamp.
-    file_r_ptr_->read(reinterpret_cast<char *>(&timestamped_data.timestamp_ms), 4);
-    sum_check_byte = SummaryBytes(reinterpret_cast<uint8_t *>(&timestamped_data.timestamp_ms), 4, sum_check_byte);
+    file_r_ptr_->read(reinterpret_cast<char *>(&timestamped_data.timestamp_s), 4);
+    sum_check_byte = SummaryBytes(reinterpret_cast<uint8_t *>(&timestamped_data.timestamp_s), 4, sum_check_byte);
+    // Update timestamp range.
+    timestamp_s_range_of_loaded_log_.first = std::min(timestamp_s_range_of_loaded_log_.first, timestamped_data.timestamp_s);
+    timestamp_s_range_of_loaded_log_.second = std::max(timestamp_s_range_of_loaded_log_.second, timestamped_data.timestamp_s);
 
     // Load data.
     const uint32_t data_size = it->second->size;
