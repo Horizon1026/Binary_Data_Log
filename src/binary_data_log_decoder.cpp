@@ -5,7 +5,7 @@
 
 namespace SLAM_DATA_LOG {
 
-uint8_t *BinaryDataLog::LoadBinaryDataFromLogFile(uint32_t index_in_file, uint32_t size) {
+uint8_t *BinaryDataLog::LoadBinaryDataFromLogFile(uint64_t index_in_file, uint32_t size) {
     if (file_r_ptr_ == nullptr) {
         ReportError("[DataLog] file_r_ptr_ is nullptr.");
         return nullptr;

@@ -37,7 +37,7 @@ public:
     // Support for decoder.
     bool LoadLogFile(const std::string &log_file_name, bool load_dynamic_data = true);
     template <typename T> static T ConvertBytes(const uint8_t *bytes, ItemType type);
-    uint8_t *LoadBinaryDataFromLogFile(uint32_t index_in_file, uint32_t size);
+    uint8_t *LoadBinaryDataFromLogFile(uint64_t index_in_file, uint32_t size);
 
     // Support for information.
     void ReportAllRegisteredPackages();
