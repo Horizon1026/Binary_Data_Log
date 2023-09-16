@@ -39,16 +39,16 @@ bool BinaryDataLog::LoadLogFile(const std::string &log_file_name, bool load_dyna
     // Load all data.
     timestamp_s_range_of_loaded_log_ = std::make_pair(INFINITY, -INFINITY);
     while (1) {
-        BREAK_IF(!LoadOnePackage(load_dynamic_data));
+        // Break only when it is end of file.
+        BREAK_IF(file_r_ptr_->eof());
+        // If one package is broken in this file, skip it and continue loading.
+        LoadOnePackage(load_dynamic_data);
     }
-
-    // If the whole log file is loaded, it means success.
-    const bool res = file_r_ptr_->eof();
 
     // Reopen this log file. If not do this, the belowing 'LoadBinaryDataFromLogFile' will make error.
     file_r_ptr_->close();
     file_r_ptr_ = std::make_unique<std::ifstream>(log_file_name, std::ios::in | std::ios::binary);
-    return res;
+    return true;
 }
 
 bool BinaryDataLog::CheckLogFileHeader() {
@@ -164,6 +164,11 @@ bool BinaryDataLog::LoadOnePackage(bool load_dynamic_data) {
     if (it == packages_id_with_objects_.end()) {
         ReportWarn("[DataLog] Load one package data failed. Package id " << package_id <<
             " is not registered.");
+        // If this is not the end of file, locate to the position of next package.
+        if (!file_r_ptr_->eof()) {
+            file_r_ptr_->seekg(timestamped_data.index_in_file, std::ios::beg);
+            file_r_ptr_->seekg(offset_to_next_content, std::ios::cur);
+        }
         return false;
     }
 
@@ -176,19 +181,22 @@ bool BinaryDataLog::LoadOnePackage(bool load_dynamic_data) {
 
     // Load data.
     const uint32_t data_size = it->second->size;
+    bool load_result = true;
     if (data_size == 0) {
-        RETURN_FALSE_IF_FALSE(LoadOnePackageWithDynamicSize(*(it->second),
-            sum_check_byte, timestamped_data, package_id, load_dynamic_data));
+        load_result = LoadOnePackageWithDynamicSize(*(it->second), sum_check_byte, timestamped_data, package_id, load_dynamic_data);
     } else {
-        RETURN_FALSE_IF_FALSE(LoadOnePackageWithStaticSize(sum_check_byte,
-            timestamped_data, package_id, data_size, true));
+        load_result = LoadOnePackageWithStaticSize(sum_check_byte, timestamped_data, package_id, data_size, true);
+    }
+    if (!load_result) {
+        ReportWarn("[DataLog] Load one package data failed for checking byte. Index in file : " <<
+            timestamped_data.index_in_file << ". Skip to load next package.");
     }
 
     // Locate to the position of next package.
     file_r_ptr_->seekg(timestamped_data.index_in_file, std::ios::beg);
     file_r_ptr_->seekg(offset_to_next_content, std::ios::cur);
 
-    return true;
+    return load_result;
 }
 
 bool BinaryDataLog::LoadOnePackageWithStaticSize(uint8_t &sum_check_byte,
