@@ -38,9 +38,17 @@ bool BinaryDataLog::LoadLogFile(const std::string &log_file_name, bool load_dyna
     RETURN_FALSE_IF_FALSE(LoadRegisteredPackages());
     // Load all data.
     timestamp_s_range_of_loaded_log_ = std::make_pair(INFINITY, -INFINITY);
-    while (1) {
-        // Break only when it is end of file.
-        BREAK_IF(file_r_ptr_->eof());
+    while (!file_r_ptr_->eof()) {
+        // Break only when it is end or out of file.
+        const uint64_t index_in_file_now = file_r_ptr_->tellg();
+        file_r_ptr_->seekg(0, std::ios::end);
+        const uint64_t index_in_file_end = file_r_ptr_->tellg();
+        if (index_in_file_now >= index_in_file_end) {
+            break;
+        } else {
+            file_r_ptr_->seekg(index_in_file_now, std::ios::beg);
+        }
+
         // If one package is broken in this file, skip it and continue loading.
         LoadOnePackage(load_dynamic_data);
     }
