@@ -31,8 +31,11 @@ public:
     bool RegisterPackage(std::unique_ptr<PackageInfo> &new_package);
     bool PrepareForRecording();
     bool RecordPackage(const uint16_t package_id, const char *data_ptr);
+    bool RecordPackage(const uint16_t package_id, const char *data_ptr, const float time_stamp_s);
     bool RecordPackage(const uint16_t package_id, const GrayImage &image);
+    bool RecordPackage(const uint16_t package_id, const GrayImage &image, const float time_stamp_s);
     bool RecordPackage(const uint16_t package_id, const RgbImage &image);
+    bool RecordPackage(const uint16_t package_id, const RgbImage &image, const float time_stamp_s);
 
     // Support for decoder.
     bool LoadLogFile(const std::string &log_file_name, bool load_dynamic_data = true);
@@ -65,7 +68,12 @@ private:
     void WriteLogFileHeader();
     bool RecordAllRegisteredPackages();
     float GetSystemTimestamp();
-    bool RecordImage(const uint16_t package_id, const int32_t channels, const int32_t image_rows, const int32_t image_cols, const uint8_t *data_ptr);
+    bool RecordImage(const uint16_t package_id,
+                     const int32_t channels,
+                     const int32_t image_rows,
+                     const int32_t image_cols,
+                     const uint8_t *data_ptr,
+                     const float time_stamp_s);
 
     // Support for decoder.
     bool CheckLogFileHeader();

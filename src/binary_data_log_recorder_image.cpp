@@ -6,19 +6,28 @@
 
 namespace SLAM_DATA_LOG {
 
+bool BinaryDataLog::RecordPackage(const uint16_t package_id, const GrayImage &image, const float time_stamp_s) {
+    return RecordImage(package_id, 1, image.rows(), image.cols(), image.data(), time_stamp_s);
+}
+
 bool BinaryDataLog::RecordPackage(const uint16_t package_id, const GrayImage &image) {
-    return RecordImage(package_id, 1, image.rows(), image.cols(), image.data());
+    return RecordImage(package_id, 1, image.rows(), image.cols(), image.data(), GetSystemTimestamp());
+}
+
+bool BinaryDataLog::RecordPackage(const uint16_t package_id, const RgbImage &image, const float time_stamp_s) {
+    return RecordImage(package_id, 3, image.rows(), image.cols(), image.data(), time_stamp_s);
 }
 
 bool BinaryDataLog::RecordPackage(const uint16_t package_id, const RgbImage &image) {
-    return RecordImage(package_id, 3, image.rows(), image.cols(), image.data());
+    return RecordImage(package_id, 3, image.rows(), image.cols(), image.data(), GetSystemTimestamp());
 }
 
 bool BinaryDataLog::RecordImage(const uint16_t package_id,
                                 const int32_t channels,
                                 const int32_t image_rows,
                                 const int32_t image_cols,
-                                const uint8_t *data_ptr) {
+                                const uint8_t *data_ptr,
+                                const float time_stamp_s) {
     RETURN_FALSE_IF(file_w_ptr_ == nullptr);
     RETURN_FALSE_IF(data_ptr == nullptr);
 
@@ -44,7 +53,7 @@ bool BinaryDataLog::RecordImage(const uint16_t package_id,
     sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&it->first), 2, sum_check_byte);
 
     // Write the system timestamp.
-    const float timestamp = GetSystemTimestamp();
+    const float timestamp = time_stamp_s;
     file_w_ptr_->write(reinterpret_cast<const char *>(&timestamp), 4);
     sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&timestamp), 4, sum_check_byte);
 

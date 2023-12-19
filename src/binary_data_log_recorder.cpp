@@ -86,7 +86,8 @@ float BinaryDataLog::GetSystemTimestamp() {
 }
 
 bool BinaryDataLog::RecordPackage(const uint16_t package_id,
-                                  const char *data_ptr) {
+                                  const char *data_ptr,
+                                  const float time_stamp_s) {
     RETURN_FALSE_IF(file_w_ptr_ == nullptr);
     RETURN_FALSE_IF(data_ptr == nullptr);
 
@@ -107,7 +108,7 @@ bool BinaryDataLog::RecordPackage(const uint16_t package_id,
     sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&it->first), 2, sum_check_byte);
 
     // Write the system timestamp.
-    const float timestamp = GetSystemTimestamp();
+    const float timestamp = time_stamp_s;
     file_w_ptr_->write(reinterpret_cast<const char *>(&timestamp), 4);
     sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&timestamp), 4, sum_check_byte);
 
@@ -119,6 +120,11 @@ bool BinaryDataLog::RecordPackage(const uint16_t package_id,
     file_w_ptr_->write(reinterpret_cast<const char *>(&sum_check_byte), 1);
 
     return true;
+}
+
+bool BinaryDataLog::RecordPackage(const uint16_t package_id,
+                                  const char *data_ptr) {
+    return RecordPackage(package_id, data_ptr, GetSystemTimestamp());
 }
 
 }
