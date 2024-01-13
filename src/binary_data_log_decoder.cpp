@@ -264,11 +264,24 @@ bool BinaryDataLog::LoadOnePackageWithDynamicSize(PackageInfo &package_info,
             break;
         }
 
+        case ItemType::kMatrix: {
+            uint16_t matrix_rows = 0;
+            uint16_t matrix_cols = 0;
+            file_r_ptr_->read(reinterpret_cast<char *>(&matrix_rows), 2);
+            file_r_ptr_->read(reinterpret_cast<char *>(&matrix_cols), 2);
+
+            data_size = 4 + matrix_rows * matrix_cols * sizeof(float);
+            file_r_ptr_->seekg(-4, std::ios::cur);
+
+            break;
+        }
+
         default:
             return false;
     }
 
     // Load total data of dynamic size package.
+    RETURN_FALSE_IF(data_size < 1);
     char *buffer = new char[data_size];
     file_r_ptr_->read(buffer, data_size);
     sum_check_byte = SummaryBytes(reinterpret_cast<uint8_t *>(buffer), data_size, sum_check_byte);

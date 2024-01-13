@@ -111,6 +111,18 @@ void RegisterAllPackages(BinaryDataLog &logger) {
             ReportError("Test failed: register a new package.");
         }
     }
+    {
+        std::unique_ptr<PackageInfo> package_ptr = std::make_unique<PackageInfo>();
+        package_ptr->id = 5;
+        package_ptr->name = "matrix";
+        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kMatrix, .name = "matrix"});
+
+        if (logger.RegisterPackage(package_ptr)) {
+            ReportInfo("Register a new package.");
+        } else {
+            ReportError("Test failed: register a new package.");
+        }
+    }
 }
 
 void TestCreateLog(const std::string &log_file_name) {
@@ -165,13 +177,18 @@ void TestCreateLog(const std::string &log_file_name) {
         logger.RecordPackage(2, reinterpret_cast<const char *>(&baro_data));
 
         if (i % (200 / max_idx_of_image_file) == 0 && idx_of_image_file < max_idx_of_image_file) {
+            // Record image.
             GrayImage gray_image;
             Visualizor::LoadImage(image_filenames[idx_of_image_file], gray_image);
             logger.RecordPackage(3, gray_image);
-
             RgbImage rgb_image;
             Visualizor::LoadImage(image_filenames[idx_of_image_file], rgb_image);
             logger.RecordPackage(4, rgb_image);
+
+            // Record matrix.
+            Mat matrix = Mat::Identity(60, 60) * static_cast<float>(idx_of_image_file);
+            matrix.topRightCorner(15, 15).setIdentity();
+            logger.RecordPackage(5, matrix);
 
             ++idx_of_image_file;
         }

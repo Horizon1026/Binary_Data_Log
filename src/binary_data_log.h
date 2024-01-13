@@ -36,6 +36,8 @@ public:
     bool RecordPackage(const uint16_t package_id, const GrayImage &image, const float time_stamp_s);
     bool RecordPackage(const uint16_t package_id, const RgbImage &image);
     bool RecordPackage(const uint16_t package_id, const RgbImage &image, const float time_stamp_s);
+    bool RecordPackage(const uint16_t package_id, const Mat &matrix);
+    bool RecordPackage(const uint16_t package_id, const Mat &matrix, const float time_stamp_s);
 
     // Support for decoder.
     bool LoadLogFile(const std::string &log_file_name, bool load_dynamic_data = true);

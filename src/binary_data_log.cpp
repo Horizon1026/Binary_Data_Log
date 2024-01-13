@@ -177,6 +177,14 @@ void BinaryDataLog::ReportAllLoadedPackages() {
                     break;
                 }
 
+                case ItemType::kMatrix: {
+                    if (package_data_per_tick.data.size() >= 4) {
+                        const uint16_t *rows_ptr = reinterpret_cast<const uint16_t *>(&package_data_per_tick.data[0]);
+                        const uint16_t *cols_ptr = reinterpret_cast<const uint16_t *>(&package_data_per_tick.data[2]);
+                        ReportText("rows " << *rows_ptr << ", cols " << *cols_ptr);
+                    }
+                }
+
                 default: {
                     for (const uint8_t &byte : package_data_per_tick.data) {
                         ReportText(static_cast<int32_t>(byte) << " ");
