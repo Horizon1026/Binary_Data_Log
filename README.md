@@ -12,4 +12,5 @@ A general binary data log codec.
 - Slam_Utility
 
 # Tips
-- 欢迎一起交流学习，不同意商用；
+- 参考开源的 protobuf 文件格式思想，设计了一种简单的二进制 log 存储协议。欢迎一起交流学习，不同意商用；
+- 使用方法参考 /test，暂时没时间写详细文档；
