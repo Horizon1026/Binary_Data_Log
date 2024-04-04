@@ -48,6 +48,9 @@ public:
     void ReportAllRegisteredPackages();
     void ReportAllLoadedPackages();
 
+    // Reference for member variables.
+    float &current_recorded_time_stamp_s() { return current_recorded_time_stamp_s_; }
+
     // Const Reference for member variables.
     // Support for decodec.
     const std::unique_ptr<std::ifstream> &file_r_ptr() const { return file_r_ptr_; }
@@ -56,6 +59,7 @@ public:
     // Support for recorder.
     const std::unique_ptr<std::fstream> &file_w_ptr() const { return file_w_ptr_; }
     const std::chrono::time_point<std::chrono::system_clock> &start_system_time() const { return start_system_time_; }
+    const float &current_recorded_time_stamp_s() const { return current_recorded_time_stamp_s_; }
     // Support for decoder.
     const std::unordered_map<uint16_t, std::vector<PackageDataPerTick>> &packages_id_with_data() const { return packages_id_with_data_; }
 
@@ -101,6 +105,7 @@ private:
     // Support for recorder.
     std::unique_ptr<std::fstream> file_w_ptr_ = nullptr;
     std::chrono::time_point<std::chrono::system_clock> start_system_time_ = std::chrono::system_clock::now();
+    float current_recorded_time_stamp_s_ = 0.0f;
 
     // Support for decoder.
     std::unordered_map<uint16_t, std::vector<PackageDataPerTick>> packages_id_with_data_;
