@@ -225,8 +225,11 @@ bool BinaryDataLog::LoadOnePackageWithStaticSize(uint8_t &sum_check_byte,
         return false;
     }
 
-    // Store this data package.
+    // Store this data package and check timestamp.
     auto &packages = packages_id_with_data_[package_id];
+    if (timestamped_data.timestamp_s == packages.back().timestamp_s) {
+        ReportWarn("[DataLog] Same timestamp " << timestamped_data.timestamp_s << "s of package is detected when decoding static size data package.");
+    }
     packages.emplace_back(timestamped_data);
 
     if (load_dynamic_data) {
@@ -295,8 +298,11 @@ bool BinaryDataLog::LoadOnePackageWithDynamicSize(PackageInfo &package_info,
         return false;
     }
 
-    // Store this data package.
+    // Store this data package and check timestamp.
     auto &packages = packages_id_with_data_[package_id];
+    if (timestamped_data.timestamp_s == packages.back().timestamp_s) {
+        ReportWarn("[DataLog] Same timestamp " << timestamped_data.timestamp_s << "s of package is detected when decoding dynamic size data package.");
+    }
     packages.emplace_back(timestamped_data);
 
     if (load_dynamic_data) {
