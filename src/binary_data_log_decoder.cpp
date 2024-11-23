@@ -1,6 +1,6 @@
 #include "binary_data_log.h"
 #include "slam_operations.h"
-#include "log_report.h"
+#include "slam_log_reporter.h"
 #include "slam_memory.h"
 
 namespace SLAM_DATA_LOG {

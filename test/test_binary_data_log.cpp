@@ -1,7 +1,7 @@
 #include "binary_data_log.h"
 #include "visualizor.h"
 #include "slam_operations.h"
-#include "log_report.h"
+#include "slam_log_reporter.h"
 
 #include "unistd.h"
 #include "iostream"
