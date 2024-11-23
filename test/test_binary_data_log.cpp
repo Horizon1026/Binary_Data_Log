@@ -12,6 +12,8 @@
 using namespace SLAM_DATA_LOG;
 using namespace SLAM_VISUALIZOR;
 
+#include "enable_stack_backward.h"
+
 #pragma pack(1)
 
 struct ImuData {

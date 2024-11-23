@@ -1,7 +1,7 @@
 #ifndef _BINARY_DATA_LOG_FILE_PROTOCAL_H_
 #define _BINARY_DATA_LOG_FILE_PROTOCAL_H_
 
-#include "datatype_basic.h"
+#include "basic_type.h"
 #include "string"
 #include "vector"
 
