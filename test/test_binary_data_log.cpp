@@ -1,5 +1,5 @@
 #include "binary_data_log.h"
-#include "visualizor.h"
+#include "visualizor_2d.h"
 #include "slam_operations.h"
 #include "slam_log_reporter.h"
 
