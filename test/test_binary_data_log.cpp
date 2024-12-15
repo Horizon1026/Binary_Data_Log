@@ -181,10 +181,10 @@ void TestCreateLog(const std::string &log_file_name) {
         if (i % (200 / max_idx_of_image_file) == 0 && idx_of_image_file < max_idx_of_image_file) {
             // Record image.
             GrayImage gray_image;
-            Visualizor::LoadImage(image_filenames[idx_of_image_file], gray_image);
+            Visualizor2D::LoadImage(image_filenames[idx_of_image_file], gray_image);
             logger.RecordPackage(3, gray_image);
             RgbImage rgb_image;
-            Visualizor::LoadImage(image_filenames[idx_of_image_file], rgb_image);
+            Visualizor2D::LoadImage(image_filenames[idx_of_image_file], rgb_image);
             logger.RecordPackage(4, rgb_image);
 
             // Record matrix.
