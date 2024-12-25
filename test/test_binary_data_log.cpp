@@ -125,6 +125,18 @@ void RegisterAllPackages(BinaryDataLog &logger) {
             ReportError("Test failed: register a new package.");
         }
     }
+    {
+        std::unique_ptr<PackageInfo> package_ptr = std::make_unique<PackageInfo>();
+        package_ptr->id = 6;
+        package_ptr->name = "png image";
+        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kPngImage, .name = "left(png)"});
+
+        if (logger.RegisterPackage(package_ptr)) {
+            ReportInfo("Register a new package.");
+        } else {
+            ReportError("Test failed: register a new package.");
+        }
+    }
 }
 
 void TestCreateLog(const std::string &log_file_name) {
@@ -150,7 +162,7 @@ void TestCreateLog(const std::string &log_file_name) {
     // Report all registered packages.
     logger.ReportAllRegisteredPackages();
 
-    // Record image.
+    // Prepare images for recording.
     std::vector<std::string> image_filenames;
     RETURN_IF(!GetFilesInPath("../example/", image_filenames));
     std::sort(image_filenames.begin(), image_filenames.end());
@@ -192,6 +204,11 @@ void TestCreateLog(const std::string &log_file_name) {
             matrix.topRightCorner(15, 15).setIdentity();
             logger.RecordPackage(5, matrix);
 
+            // Record png image.
+            std::vector<uint8_t> png_image;
+            Visualizor2D::SaveToPngImageData(rgb_image, png_image);
+            logger.RecordPackage(6, png_image, ItemType::kPngImage);
+
             ++idx_of_image_file;
         }
 
@@ -211,7 +228,6 @@ void TestLoadLog(const std::string &log_file_name) {
 
     // Report all registered packages.
     logger.ReportAllRegisteredPackages();
-
     // Report all loaded packages.
     logger.ReportAllLoadedPackages();
 }
@@ -228,7 +244,6 @@ void TestPreloadLog(const std::string &log_file_name) {
 
     // Report all registered packages.
     logger.ReportAllRegisteredPackages();
-
     // Report all loaded packages.
     logger.ReportAllLoadedPackages();
 }
@@ -236,7 +251,7 @@ void TestPreloadLog(const std::string &log_file_name) {
 int main(int argc, char **argv) {
     ReportInfo(YELLOW ">> Test binary data log decodec." RESET_COLOR);
 
-    const std::string log_file_name = "data.binlog";
+    const std::string log_file_name = "../output/data.binlog";
     TestCreateLog(log_file_name);
     TestLoadLog(log_file_name);
     TestPreloadLog(log_file_name);

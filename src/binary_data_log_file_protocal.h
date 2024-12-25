@@ -44,7 +44,9 @@ for each package:
         and including the checking byte.
     [4] - [5]: Package id.
     [6] - [9]: System timestamp of this package content. Unit is millisecond.
+
     [10] - [n]: Binary data.
+
     [n + 1]: Sum check byte of this package.
 
 for each image package:
@@ -74,6 +76,18 @@ for each matrix package:
 
     [n + 1]: Sum check byte of this package.
 
+for each PNG image package:
+    [0] - [3]: Offset index to the next 'package_content',
+        which means the length of this 'package_content',
+        and including the checking byte.
+    [4] - [5]: Package id.
+    [6] - [9]: System timestamp of this package content. Unit is millisecond.
+
+    [10] - [13]: Number of bytes in png file.
+    [14] - [n]: Binary data of png file.
+
+    [n + 1]: Sum check byte of this package.
+
 */
 
 using namespace SLAM_UTILITY;
@@ -92,7 +106,8 @@ enum class ItemType : uint8_t {
     kFloat = 8,
     kDouble = 9,
     kImage = 10,
-    kMatrix = 11,
+    kPngImage = 11,
+    kMatrix = 12,
 };
 
 static std::vector<uint32_t> item_type_sizes = {
@@ -107,6 +122,7 @@ static std::vector<uint32_t> item_type_sizes = {
     4,  // kFloat.
     8,  // kDouble.
     0,  // kImage.
+    0,  // kPngImage.
     0,  // kMatrix.
 };
 
@@ -122,6 +138,7 @@ static std::vector<std::string> item_type_strings = {
     "kFloat",
     "kDouble",
     "kImage",
+    "kPngImage",
     "kMatrix",
 };
 

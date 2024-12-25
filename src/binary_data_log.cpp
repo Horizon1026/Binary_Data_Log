@@ -2,8 +2,11 @@
 #include "slam_operations.h"
 #include "slam_log_reporter.h"
 
-
 namespace SLAM_DATA_LOG {
+
+namespace {
+    constexpr uint32_t kMaxPrintBytesForEachItem = 10;
+}
 
 BinaryDataLog::~BinaryDataLog() {
     if (file_w_ptr_ != nullptr) {
@@ -100,7 +103,7 @@ bool BinaryDataLog::RegisterPackage(std::unique_ptr<PackageInfo> &new_package) {
 }
 
 bool BinaryDataLog::PrepareForRecording() {
-    RETURN_FALSE_IF_FALSE(RecordAllRegisteredPackages());
+    RETURN_FALSE_IF_FALSE(RecordAllRegisteredPackagesAsFileHead());
     return true;
 }
 
@@ -128,10 +131,10 @@ std::string BinaryDataLog::LoadStringFromBinaryFile(uint32_t size) {
 }
 
 void BinaryDataLog::ReportAllRegisteredPackages() {
-    ReportInfo("[DataLog] Report all registered packages information:");
+    ReportColorInfo("[DataLog] Report all registered packages information:");
     for (const auto &pair : packages_id_with_objects_) {
         const auto &package = pair.second;
-        ReportInfo(">> Package name : " << package->name);
+        ReportColorInfo(">> Package name : " << package->name);
         ReportInfo("   Package id : " << package->id);
         ReportInfo("   Package items : [type | data_index_in_package_data | name]");
         for (const auto &item : package->items) {
@@ -142,7 +145,7 @@ void BinaryDataLog::ReportAllRegisteredPackages() {
 }
 
 void BinaryDataLog::ReportAllLoadedPackages() {
-    ReportInfo("[DataLog] Report all loaded packages binary data between " << timestamp_s_range_of_loaded_log_.first <<
+    ReportColorInfo("[DataLog] Report all loaded packages binary data between " << timestamp_s_range_of_loaded_log_.first <<
         "s to " << timestamp_s_range_of_loaded_log_.second << "s:");
     for (const auto &package : packages_id_with_data_) {
         const auto it = packages_id_with_objects_.find(package.first);
@@ -159,7 +162,7 @@ void BinaryDataLog::ReportAllLoadedPackages() {
 
         const auto &first_item_type = items_info.front().type;
 
-        ReportInfo(">> Package id : " << package.first << ", context [ time(ms) | index_in_log_file | size_of_all_in_file | bindata ] :");
+        ReportColorInfo(">> Package id : " << package.first << ", context [ time(ms) | index_in_log_file | size_of_all_in_file | bindata ] :");
         for (const auto &package_data_per_tick : package.second) {
             ReportText(GREEN "[Info ] " RESET_COLOR "      " << package_data_per_tick.timestamp_s << " | ");
             ReportText(package_data_per_tick.index_in_file << " | ");
@@ -171,8 +174,7 @@ void BinaryDataLog::ReportAllLoadedPackages() {
                         const uint8_t *channel_ptr = reinterpret_cast<const uint8_t *>(&package_data_per_tick.data[0]);
                         const uint16_t *rows_ptr = reinterpret_cast<const uint16_t *>(&package_data_per_tick.data[1]);
                         const uint16_t *cols_ptr = reinterpret_cast<const uint16_t *>(&package_data_per_tick.data[3]);
-                        ReportText("channel " << static_cast<uint32_t>(*channel_ptr) << ", rows " << *rows_ptr << ", cols " <<
-                            *cols_ptr);
+                        ReportText("[kImage] channel " << static_cast<uint32_t>(*channel_ptr) << ", rows " << *rows_ptr << ", cols " << *cols_ptr << ". ");
                     }
                     break;
                 }
@@ -181,18 +183,34 @@ void BinaryDataLog::ReportAllLoadedPackages() {
                     if (package_data_per_tick.data.size() >= 4) {
                         const uint16_t *rows_ptr = reinterpret_cast<const uint16_t *>(&package_data_per_tick.data[0]);
                         const uint16_t *cols_ptr = reinterpret_cast<const uint16_t *>(&package_data_per_tick.data[2]);
-                        ReportText("rows " << *rows_ptr << ", cols " << *cols_ptr);
-                    }
-                }
-
-                default: {
-                    for (const uint8_t &byte : package_data_per_tick.data) {
-                        ReportText(static_cast<int32_t>(byte) << " ");
+                        ReportText("[kMatrix] rows " << *rows_ptr << ", cols " << *cols_ptr << ". ");
                     }
                     break;
                 }
+
+                case ItemType::kPngImage: {
+                    if (package_data_per_tick.data.size() >= 4) {
+                        const uint32_t *num_of_png_data_types = reinterpret_cast<const uint32_t *>(&package_data_per_tick.data[0]);
+                        ReportText("[kPngImage] " << *num_of_png_data_types << " bytes. ");
+                    }
+                    break;
+                }
+
+                default: break;
             }
 
+            // Print loaded bytes of this item.
+            const uint32_t num_of_bytes_in_item = package_data_per_tick.data.size();
+            if (num_of_bytes_in_item != 0) {
+                ReportText("[Bytes] ");
+                const uint32_t max_i = std::min(kMaxPrintBytesForEachItem, num_of_bytes_in_item);
+                for (uint32_t i = 0; i < max_i; ++i) {
+                    ReportText(static_cast<int32_t>(package_data_per_tick.data[i]) << " ");
+                }
+                if (kMaxPrintBytesForEachItem < num_of_bytes_in_item) {
+                    ReportText(" ...(" << num_of_bytes_in_item << " bytes)");
+                }
+            }
             ReportText(std::endl);
         }
     }

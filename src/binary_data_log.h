@@ -36,6 +36,8 @@ public:
     bool RecordPackage(const uint16_t package_id, const GrayImage &image, const float time_stamp_s);
     bool RecordPackage(const uint16_t package_id, const RgbImage &image);
     bool RecordPackage(const uint16_t package_id, const RgbImage &image, const float time_stamp_s);
+    bool RecordPackage(const uint16_t package_id, const std::vector<uint8_t> &data_bytes, const ItemType type);
+    bool RecordPackage(const uint16_t package_id, const std::vector<uint8_t> &data_bytes, const ItemType type, const float time_stamp_s);
     bool RecordPackage(const uint16_t package_id, const Mat &matrix);
     bool RecordPackage(const uint16_t package_id, const Mat &matrix, const float time_stamp_s);
 
@@ -72,7 +74,7 @@ private:
 
     // Support for recorder.
     void WriteLogFileHeader();
-    bool RecordAllRegisteredPackages();
+    bool RecordAllRegisteredPackagesAsFileHead();
     float GetSystemTimestamp();
     bool RecordImage(const uint16_t package_id,
                      const int32_t channels,

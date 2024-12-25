@@ -6,7 +6,7 @@
 
 namespace SLAM_DATA_LOG {
 
-bool BinaryDataLog::RecordAllRegisteredPackages() {
+bool BinaryDataLog::RecordAllRegisteredPackagesAsFileHead() {
     if (packages_id_with_objects_.empty()) {
         ReportInfo("[DataLog] No registered package.");
         return false;
@@ -86,6 +86,11 @@ float BinaryDataLog::GetSystemTimestamp() {
 }
 
 bool BinaryDataLog::RecordPackage(const uint16_t package_id,
+                                  const char *data_ptr) {
+    return RecordPackage(package_id, data_ptr, GetSystemTimestamp());
+}
+
+bool BinaryDataLog::RecordPackage(const uint16_t package_id,
                                   const char *data_ptr,
                                   const float time_stamp_s) {
     RETURN_FALSE_IF(file_w_ptr_ == nullptr);
@@ -120,11 +125,6 @@ bool BinaryDataLog::RecordPackage(const uint16_t package_id,
     file_w_ptr_->write(reinterpret_cast<const char *>(&sum_check_byte), 1);
 
     return true;
-}
-
-bool BinaryDataLog::RecordPackage(const uint16_t package_id,
-                                  const char *data_ptr) {
-    return RecordPackage(package_id, data_ptr, GetSystemTimestamp());
 }
 
 }

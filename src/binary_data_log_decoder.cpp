@@ -68,6 +68,7 @@ bool BinaryDataLog::CheckLogFileHeader() {
         ReportWarn("[DataLog] Log header error, it cannot be decoded.");
         return false;
     }
+    ReportInfo("[DataLog] Log header check ok.");
     return true;
 }
 
@@ -93,16 +94,15 @@ bool BinaryDataLog::LoadRegisteredPackages() {
 
         offset += offset_to_next_package;
 
+        // Load information of a package.
         // Load package id.
         std::unique_ptr<PackageInfo> package_ptr = std::make_unique<PackageInfo>();
         file_r_ptr_->read(reinterpret_cast<char *>(&package_ptr->id), 2);
         sum_check_byte = SummaryBytes(reinterpret_cast<uint8_t *>(&package_ptr->id), 2, sum_check_byte);
-
         // Load package name length.
         uint8_t package_name_length = 0;
         file_r_ptr_->read(reinterpret_cast<char *>(&package_name_length), 1);
         sum_check_byte = SummaryBytes(reinterpret_cast<uint8_t *>(&package_name_length), 1, sum_check_byte);
-
         // Load package name.
         package_ptr->name = LoadStringFromBinaryFile(package_name_length);
         sum_check_byte = SummaryBytes(reinterpret_cast<uint8_t *>(package_ptr->name.data()), package_name_length, sum_check_byte);
@@ -114,16 +114,15 @@ bool BinaryDataLog::LoadRegisteredPackages() {
             auto &new_item = package_ptr->items.back();
             new_item.bindata_index_in_package = item_data_index_in_package_data;
 
+            // Load information of an item.
             // Load item type.
             file_r_ptr_->read(reinterpret_cast<char *>(&new_item.type), 1);
             sum_check_byte = SummaryBytes(reinterpret_cast<uint8_t *>(&new_item.type), 1, sum_check_byte);
             item_data_index_in_package_data += item_type_sizes[static_cast<uint32_t>(new_item.type)];
-
             // Load item name length.
             uint8_t item_name_length = 0;
             file_r_ptr_->read(reinterpret_cast<char *>(&item_name_length), 1);
             sum_check_byte = SummaryBytes(reinterpret_cast<uint8_t *>(&item_name_length), 1, sum_check_byte);
-
             // Load item name.
             new_item.name = LoadStringFromBinaryFile(item_name_length);
             sum_check_byte = SummaryBytes(reinterpret_cast<uint8_t *>(new_item.name.data()), item_name_length, sum_check_byte);
@@ -134,7 +133,6 @@ bool BinaryDataLog::LoadRegisteredPackages() {
         // Summary byte check.
         uint8_t loaded_sum_check_byte = 0;
         file_r_ptr_->read(reinterpret_cast<char *>(&loaded_sum_check_byte), 1);
-
         if (sum_check_byte != loaded_sum_check_byte) {
             ReportWarn("[DataLog] Package summary check byte failed. Compute " <<
                 static_cast<int32_t>(sum_check_byte) << " != " <<
@@ -263,7 +261,6 @@ bool BinaryDataLog::LoadOnePackageWithDynamicSize(PackageInfo &package_info,
 
             data_size = 5 + channels * image_rows * image_cols;
             file_r_ptr_->seekg(-5, std::ios::cur);
-
             break;
         }
 
@@ -275,7 +272,14 @@ bool BinaryDataLog::LoadOnePackageWithDynamicSize(PackageInfo &package_info,
 
             data_size = 4 + matrix_rows * matrix_cols * sizeof(float);
             file_r_ptr_->seekg(-4, std::ios::cur);
+            break;
+        }
 
+        case ItemType::kPngImage: {
+            uint32_t num_of_png_bytes = 0;
+            file_r_ptr_->read(reinterpret_cast<char *>(&num_of_png_bytes), 4);
+            data_size = 4 + num_of_png_bytes;
+            file_r_ptr_->seekg(-4, std::ios::cur);
             break;
         }
 

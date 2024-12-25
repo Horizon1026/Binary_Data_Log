@@ -47,11 +47,9 @@ bool BinaryDataLog::RecordImage(const uint16_t package_id,
     const uint32_t offset = 4 + 2 + 4 + image_data_size + 1;
     file_w_ptr_->write(reinterpret_cast<const char *>(&offset), 4);
     uint8_t sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&offset), 4, 0);
-
     // Write the package id.
     file_w_ptr_->write(reinterpret_cast<const char *>(&it->first), 2);
     sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&it->first), 2, sum_check_byte);
-
     // Write the system timestamp.
     const float timestamp = time_stamp_s;
     file_w_ptr_->write(reinterpret_cast<const char *>(&timestamp), 4);
@@ -103,11 +101,9 @@ bool BinaryDataLog::RecordPackage(const uint16_t package_id, const Mat &matrix, 
     const uint32_t offset = 4 + 2 + 4 + matrix_data_size + 1;
     file_w_ptr_->write(reinterpret_cast<const char *>(&offset), 4);
     uint8_t sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&offset), 4, 0);
-
     // Write the package id.
     file_w_ptr_->write(reinterpret_cast<const char *>(&it->first), 2);
     sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&it->first), 2, sum_check_byte);
-
     // Write the system timestamp.
     const float timestamp = time_stamp_s;
     file_w_ptr_->write(reinterpret_cast<const char *>(&timestamp), 4);
@@ -126,6 +122,52 @@ bool BinaryDataLog::RecordPackage(const uint16_t package_id, const Mat &matrix, 
     MatImgF row_major_matrix = matrix;
     file_w_ptr_->write(reinterpret_cast<const char *>(row_major_matrix.data()), element_num);
     sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(row_major_matrix.data()), element_num, sum_check_byte);
+
+    // Write the summary check byte.
+    file_w_ptr_->write(reinterpret_cast<const char *>(&sum_check_byte), 1);
+    return true;
+}
+
+bool BinaryDataLog::RecordPackage(const uint16_t package_id, const std::vector<uint8_t> &data_bytes, const ItemType type) {
+    return RecordPackage(package_id, data_bytes, type, GetSystemTimestamp());
+}
+
+bool BinaryDataLog::RecordPackage(const uint16_t package_id, const std::vector<uint8_t> &data_bytes, const ItemType type, const float time_stamp_s) {
+    RETURN_FALSE_IF(data_bytes.empty());
+
+    const auto it = packages_id_with_objects_.find(package_id);
+    if (it == packages_id_with_objects_.end()) {
+        ReportError("[DataLog] Package id " << package_id << " is not registered.");
+        return false;
+    }
+
+    // TODO: Now only support ItemType::kPngImage.
+    RETURN_FALSE_IF(type != ItemType::kPngImage);
+
+    // Check png image size.
+    const uint32_t num_of_bytes = static_cast<uint32_t>(data_bytes.size());
+    const uint32_t png_image_data_size = 4 + num_of_bytes;
+
+    // Write the offset to the next package data.
+    // offset, package_id, timestamp, binary_data, check_byte.
+    const uint32_t offset = 4 + 2 + 4 + png_image_data_size + 1;
+    file_w_ptr_->write(reinterpret_cast<const char *>(&offset), 4);
+    uint8_t sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&offset), 4, 0);
+    // Write the package id.
+    file_w_ptr_->write(reinterpret_cast<const char *>(&it->first), 2);
+    sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&it->first), 2, sum_check_byte);
+    // Write the system timestamp.
+    const float timestamp = time_stamp_s;
+    file_w_ptr_->write(reinterpret_cast<const char *>(&timestamp), 4);
+    sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&timestamp), 4, sum_check_byte);
+
+    // Write the binary data.
+    // Write the number of date bytes.
+    file_w_ptr_->write(reinterpret_cast<const char *>(&num_of_bytes), 4);
+    sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&num_of_bytes), 4, sum_check_byte);
+    // Directly write all data bytes.
+    file_w_ptr_->write(reinterpret_cast<const char *>(data_bytes.data()), data_bytes.size());
+    sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(data_bytes.data()), data_bytes.size(), sum_check_byte);
 
     // Write the summary check byte.
     file_w_ptr_->write(reinterpret_cast<const char *>(&sum_check_byte), 1);
