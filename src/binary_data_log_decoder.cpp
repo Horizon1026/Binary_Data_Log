@@ -195,7 +195,7 @@ bool BinaryDataLog::LoadOnePackage(bool load_dynamic_data) {
     }
     if (!load_result) {
         ReportWarn("[DataLog] Load one package data failed for checking byte. Index in file : " <<
-            timestamped_data.index_in_file << ". Skip to load next package.");
+            timestamped_data.index_in_file << ". Data size [" << data_size << "]. Skip to load next package.");
     }
 
     // Locate to the position of next package.

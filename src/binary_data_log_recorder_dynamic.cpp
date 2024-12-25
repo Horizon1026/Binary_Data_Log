@@ -166,8 +166,8 @@ bool BinaryDataLog::RecordPackage(const uint16_t package_id, const std::vector<u
     file_w_ptr_->write(reinterpret_cast<const char *>(&num_of_bytes), 4);
     sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&num_of_bytes), 4, sum_check_byte);
     // Directly write all data bytes.
-    file_w_ptr_->write(reinterpret_cast<const char *>(data_bytes.data()), data_bytes.size());
-    sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(data_bytes.data()), data_bytes.size(), sum_check_byte);
+    file_w_ptr_->write(reinterpret_cast<const char *>(data_bytes.data()), num_of_bytes);
+    sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(data_bytes.data()), num_of_bytes, sum_check_byte);
 
     // Write the summary check byte.
     file_w_ptr_->write(reinterpret_cast<const char *>(&sum_check_byte), 1);
