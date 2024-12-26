@@ -68,7 +68,6 @@ bool BinaryDataLog::CheckLogFileHeader() {
         ReportWarn("[DataLog] Log header error, it cannot be decoded.");
         return false;
     }
-    ReportInfo("[DataLog] Log header check ok.");
     return true;
 }
 
