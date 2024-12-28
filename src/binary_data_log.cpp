@@ -73,11 +73,11 @@ bool BinaryDataLog::RegisterPackage(std::unique_ptr<PackageInfo> &new_package) {
         return false;
     }
 
-    // If one of items in package is image, this package should only have one item.
+    // If one of items in package has dynamic size, this package should only have one item.
     if (package_info_ptr->items.size() > 1) {
         for (const auto &item : package_info_ptr->items) {
-            if (item.type > ItemType::kDouble) {
-                ReportError("[DataLog] If one of items in package is image, this package should only have one item.");
+            if (item.type > ItemType::kPose6Dof) {
+                ReportError("[DataLog] If one of items in package has dynamic size, this package should only have one item.");
                 return false;
             }
         }

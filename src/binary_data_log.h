@@ -42,7 +42,7 @@ public:
     bool RecordPackage(const uint16_t package_id, const Mat &matrix, const float time_stamp_s);
 
     // Support for decoder.
-    bool LoadLogFile(const std::string &log_file_name, bool load_dynamic_data = true);
+    bool LoadLogFile(const std::string &log_file_name, bool load_full_data = true);
     template <typename T> static T ConvertBytes(const uint8_t *bytes, ItemType type);
     uint8_t *LoadBinaryDataFromLogFile(uint64_t index_in_file, uint32_t size);
 
@@ -86,17 +86,17 @@ private:
     // Support for decoder.
     bool CheckLogFileHeader();
     bool LoadRegisteredPackages();
-    bool LoadOnePackage(bool load_dynamic_data = true);
+    bool LoadOnePackage(bool load_full_data = true);
     bool LoadOnePackageWithStaticSize(uint8_t &sum_check_byte,
                                       PackageDataPerTick &timestamped_data,
                                       uint16_t package_id,
                                       uint32_t data_size,
-                                      bool load_dynamic_data);
+                                      bool load_full_data);
     bool LoadOnePackageWithDynamicSize(PackageInfo &package_info,
                                        uint8_t &sum_check_byte,
                                        PackageDataPerTick &timestamped_data,
                                        uint16_t package_id,
-                                       bool load_dynamic_data);
+                                       bool load_full_data);
 
 private:
     // Support for decodec.

@@ -32,6 +32,21 @@ struct BaroData {
     uint8_t valid = 0;
 };
 
+struct StateData {
+    uint8_t is_vel_valid = 0;
+    float vel_x = 0.0f;
+    float vel_y = 0.0f;
+    float vel_z = 0.0f;
+    uint8_t is_pose_valid = 0;
+    float pos_x = 0.0f;
+    float pos_y = 0.0f;
+    float pos_z = 0.0f;
+    float atti_w = 0.0f;
+    float atti_x = 0.0f;
+    float atti_y = 0.0f;
+    float atti_z = 0.0f;
+};
+
 #pragma pack()
 
 bool GetFilesInPath(std::string dir, std::vector<std::string> &filenames) {
@@ -149,6 +164,21 @@ void RegisterAllPackages(BinaryDataLog &logger) {
             ReportError("Test failed: register a new package.");
         }
     }
+    {
+        std::unique_ptr<PackageInfo> package_ptr = std::make_unique<PackageInfo>();
+        package_ptr->id = 8;
+        package_ptr->name = "slam state";
+        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kUint8, .name = "is_vel_valid"});
+        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kVector3, .name = "velocity"});
+        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kUint8, .name = "is_pose_valid"});
+        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kPose6Dof, .name = "pose"});
+
+        if (logger.RegisterPackage(package_ptr)) {
+            ReportInfo("Register a new package.");
+        } else {
+            ReportError("Test failed: register a new package.");
+        }
+    }
 }
 
 void TestCreateLog(const std::string &log_file_name) {
@@ -201,6 +231,22 @@ void TestCreateLog(const std::string &log_file_name) {
             .valid = i < 30,
         };
         logger.RecordPackage(2, reinterpret_cast<const char *>(&baro_data));
+
+        StateData state_data {
+            .is_vel_valid = i > 50,
+            .vel_x = std::sin(temp),
+            .vel_y = std::sin(temp + 0.05f),
+            .vel_z = std::sin(temp + 0.6f),
+            .is_pose_valid = i < 100,
+            .pos_x = i + 1.0f,
+            .pos_y = 1.2f * i,
+            .pos_z = std::sqrt(static_cast<float>(i)),
+            .atti_w = 1.0f,
+            .atti_x = 0.0f,
+            .atti_y = 0.0f,
+            .atti_z = 0.0f,
+        };
+        logger.RecordPackage(8, reinterpret_cast<const char *>(&state_data));
 
         if (i % (200 / max_idx_of_image_file) == 0 && idx_of_image_file < max_idx_of_image_file) {
             // Record image.

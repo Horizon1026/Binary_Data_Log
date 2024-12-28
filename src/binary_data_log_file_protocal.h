@@ -37,7 +37,6 @@ for each package:
 
 /* Part 3: Packages' content */
 /*
-
 for each package:
     [0] - [3]: Offset index to the next 'package_content',
         which means the length of this 'package_content',
@@ -45,48 +44,38 @@ for each package:
     [4] - [5]: Package id.
     [6] - [9]: System timestamp of this package content. Unit is millisecond.
 
-    [10] - [n]: Binary data.
+    [10] - [n]: Binary data.(This is the only different part of different packages)
 
     [n + 1]: Sum check byte of this package.
 
-for each image package:
-    [0] - [3]: Offset index to the next 'package_content',
-        which means the length of this 'package_content',
-        and including the checking byte.
-    [4] - [5]: Package id.
-    [6] - [9]: System timestamp of this package content. Unit is millisecond.
+for each vecor3 package:
+    [10] - [13]: Vector in X axis.
+    [14] - [17]: Vector in Y axis.
+    [18] - [21]: Vector in Z axis.
 
+for each pose 6dof package:
+    [10] - [13]: Position in X axis.
+    [14] - [17]: Position in Y axis.
+    [18] - [21]: Position in Z axis.
+    [22] - [25]: Rotation in quaternion w.
+    [26] - [29]: Rotation in quaternion x.
+    [30] - [33]: Rotation in quaternion y.
+    [34] - [37]: Rotation in quaternion z.
+
+for each image package:
     [10]: Channels.
     [11] - [12]: Image rows(height).
     [13] - [14]: Image cols(width).
     [15] - [n]: Binary data.
 
-    [n + 1]: Sum check byte of this package.
-
-for each matrix package:
-    [0] - [3]: Offset index to the next 'package_content',
-        which means the length of this 'package_content',
-        and including the checking byte.
-    [4] - [5]: Package id.
-    [6] - [9]: System timestamp of this package content. Unit is millisecond.
-
-    [10] - [11]: Matrix rows.
-    [12] - [13]: Matrix cols.
-    [14] - [n]: Binary data (standard float encode, row major).
-
-    [n + 1]: Sum check byte of this package.
-
 for each PNG image package:
-    [0] - [3]: Offset index to the next 'package_content',
-        which means the length of this 'package_content',
-        and including the checking byte.
-    [4] - [5]: Package id.
-    [6] - [9]: System timestamp of this package content. Unit is millisecond.
-
     [10] - [13]: Number of bytes in png file.
     [14] - [n]: Binary data of png file.
 
-    [n + 1]: Sum check byte of this package.
+for each matrix package:
+    [10] - [11]: Matrix rows.
+    [12] - [13]: Matrix cols.
+    [14] - [n]: Binary data (standard float encode, row major).
 
 */
 
@@ -105,9 +94,11 @@ enum class ItemType : uint8_t {
     kInt64 = 7,
     kFloat = 8,
     kDouble = 9,
-    kImage = 10,
-    kPngImage = 11,
-    kMatrix = 12,
+    kVector3 = 10,
+    kPose6Dof = 11,
+    kImage = 12,
+    kPngImage = 13,
+    kMatrix = 14,
 };
 
 static std::vector<uint32_t> item_type_sizes = {
@@ -121,6 +112,8 @@ static std::vector<uint32_t> item_type_sizes = {
     8,  // kInt64.
     4,  // kFloat.
     8,  // kDouble.
+    12, // kVector3.
+    28, // kPose6Dof.
     0,  // kImage.
     0,  // kPngImage.
     0,  // kMatrix.
@@ -137,12 +130,14 @@ static std::vector<std::string> item_type_strings = {
     "kInt64",
     "kFloat",
     "kDouble",
+    "kVector3",
+    "kPose6Dof",
     "kImage",
     "kPngImage",
     "kMatrix",
 };
 
-static std::string binary_log_file_header = "SLAM_DATA_LOG";
+static std::string binary_log_file_header = "BINARY_DATA_LOG";
 
 struct PackageItemInfo {
     ItemType type = ItemType::kUint32;
