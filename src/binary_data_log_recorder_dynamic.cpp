@@ -174,4 +174,51 @@ bool BinaryDataLog::RecordPackage(const uint16_t package_id, const std::vector<u
     return true;
 }
 
+bool BinaryDataLog::RecordPackage(const uint16_t package_id, const std::vector<Vec3> &points_cloud) {
+    return RecordPackage(package_id, points_cloud, GetSystemTimestamp());
+}
+
+bool BinaryDataLog::RecordPackage(const uint16_t package_id, const std::vector<Vec3> &points_cloud, const float time_stamp_s) {
+    RETURN_FALSE_IF(points_cloud.empty());
+
+    const auto it = packages_id_with_objects_.find(package_id);
+    if (it == packages_id_with_objects_.end()) {
+        ReportError("[DataLog] Package id " << package_id << " is not registered.");
+        return false;
+    }
+
+    // Check png image size.
+    const uint32_t num_of_points = static_cast<uint32_t>(points_cloud.size());
+    const uint32_t point_cloud_data_size = 4 + num_of_points * 3 * sizeof(float);
+
+    // Write the offset to the next package data.
+    // offset, package_id, timestamp, binary_data, check_byte.
+    const uint32_t offset = 4 + 2 + 4 + point_cloud_data_size + 1;
+    file_w_ptr_->write(reinterpret_cast<const char *>(&offset), 4);
+    uint8_t sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&offset), 4, 0);
+    // Write the package id.
+    file_w_ptr_->write(reinterpret_cast<const char *>(&it->first), 2);
+    sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&it->first), 2, sum_check_byte);
+    // Write the system timestamp.
+    const float timestamp = time_stamp_s;
+    file_w_ptr_->write(reinterpret_cast<const char *>(&timestamp), 4);
+    sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&timestamp), 4, sum_check_byte);
+
+    // Write the binary data.
+    // Write the number of date bytes.
+    file_w_ptr_->write(reinterpret_cast<const char *>(&num_of_points), 4);
+    sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&num_of_points), 4, sum_check_byte);
+    // Iterate points cloud, directly write all data bytes.
+    for (const auto &point : points_cloud) {
+        for (uint32_t i = 0; i < 3; ++i) {
+            file_w_ptr_->write(reinterpret_cast<const char *>(&point[i]), 4);
+            sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&point[i]), 4, sum_check_byte);
+        }
+    }
+
+    // Write the summary check byte.
+    file_w_ptr_->write(reinterpret_cast<const char *>(&sum_check_byte), 1);
+    return true;
+}
+
 }

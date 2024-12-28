@@ -40,6 +40,8 @@ public:
     bool RecordPackage(const uint16_t package_id, const std::vector<uint8_t> &data_bytes, const ItemType type, const float time_stamp_s);
     bool RecordPackage(const uint16_t package_id, const Mat &matrix);
     bool RecordPackage(const uint16_t package_id, const Mat &matrix, const float time_stamp_s);
+    bool RecordPackage(const uint16_t package_id, const std::vector<Vec3> &points_cloud);
+    bool RecordPackage(const uint16_t package_id, const std::vector<Vec3> &points_cloud, const float time_stamp_s);
 
     // Support for decoder.
     bool LoadLogFile(const std::string &log_file_name, bool load_full_data = true);
@@ -85,7 +87,7 @@ private:
 
     // Support for decoder.
     bool CheckLogFileHeader();
-    bool LoadRegisteredPackages();
+    bool LoadRegisteredPackagesFromFileHead();
     bool LoadOnePackage(bool load_full_data = true);
     bool LoadOnePackageWithStaticSize(uint8_t &sum_check_byte,
                                       PackageDataPerTick &timestamped_data,

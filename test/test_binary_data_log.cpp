@@ -155,8 +155,11 @@ void RegisterAllPackages(BinaryDataLog &logger) {
     {
         std::unique_ptr<PackageInfo> package_ptr = std::make_unique<PackageInfo>();
         package_ptr->id = 7;
-        package_ptr->name = "random matrix";
-        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kMatrix, .name = "matrix"});
+        package_ptr->name = "slam state";
+        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kUint8, .name = "is_vel_valid"});
+        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kVector3, .name = "velocity"});
+        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kUint8, .name = "is_pose_valid"});
+        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kPose6Dof, .name = "pose"});
 
         if (logger.RegisterPackage(package_ptr)) {
             ReportInfo("Register a new package.");
@@ -167,11 +170,8 @@ void RegisterAllPackages(BinaryDataLog &logger) {
     {
         std::unique_ptr<PackageInfo> package_ptr = std::make_unique<PackageInfo>();
         package_ptr->id = 8;
-        package_ptr->name = "slam state";
-        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kUint8, .name = "is_vel_valid"});
-        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kVector3, .name = "velocity"});
-        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kUint8, .name = "is_pose_valid"});
-        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kPose6Dof, .name = "pose"});
+        package_ptr->name = "local map";
+        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kPointCloud, .name = "point cloud"});
 
         if (logger.RegisterPackage(package_ptr)) {
             ReportInfo("Register a new package.");
@@ -212,15 +212,15 @@ void TestCreateLog(const std::string &log_file_name) {
     uint32_t idx_of_image_file = 0;
 
     // Record data.
-    for (uint32_t i = 0; i < 200; ++i) {
+    for (uint32_t i = 0; i < 100; ++i) {
         const float temp = static_cast<float>(i) / 15.0f;
         ImuData imu_data {
             .gyro_x = - std::sin(temp + 0.34f),
-            .gyro_y = std::sin(temp + 1.5f),
-            .gyro_z = std::sin(temp + 1.0f),
-            .accel_x = std::sin(temp),
-            .accel_y = std::sin(temp + 0.05f),
-            .accel_z = std::sin(temp + 0.6f),
+            .gyro_y = std::sin(1.05f * temp + 1.5f),
+            .gyro_z = std::sin(1.1f * temp + 1.0f),
+            .accel_x = std::sin(1.15f * temp),
+            .accel_y = std::sin(1.2f * temp + 0.05f),
+            .accel_z = std::sin(1.25f * temp + 0.6f),
             .valid = i > 50,
         };
         logger.RecordPackage(1, reinterpret_cast<const char *>(&imu_data));
@@ -246,9 +246,9 @@ void TestCreateLog(const std::string &log_file_name) {
             .atti_y = 0.0f,
             .atti_z = 0.0f,
         };
-        logger.RecordPackage(8, reinterpret_cast<const char *>(&state_data));
+        logger.RecordPackage(7, reinterpret_cast<const char *>(&state_data));
 
-        if (i % (200 / max_idx_of_image_file) == 0 && idx_of_image_file < max_idx_of_image_file) {
+        if (i % (100 / max_idx_of_image_file) == 0 && idx_of_image_file < max_idx_of_image_file) {
             // Record image.
             GrayImage gray_image;
             Visualizor2D::LoadImage(image_filenames[idx_of_image_file], gray_image);
@@ -258,20 +258,28 @@ void TestCreateLog(const std::string &log_file_name) {
             logger.RecordPackage(4, rgb_image);
 
             // Record matrix.
-            Mat matrix = Mat::Identity(60, 60) * static_cast<float>(idx_of_image_file);
-            matrix.topRightCorner(15, 15).setIdentity();
-            logger.RecordPackage(5, matrix);
+            const Mat random_matrix = Mat::Random(80, 120);
+            logger.RecordPackage(5, random_matrix);
 
             // Record png image.
             std::vector<uint8_t> png_image;
             Visualizor2D::SaveToPngImageData(rgb_image, png_image);
             logger.RecordPackage(6, png_image, ItemType::kPngImage);
 
-            // Record random matrix.
-            const Mat random_matrix = Mat::Random(80, 60);
-            logger.RecordPackage(7, random_matrix);
-
             ++idx_of_image_file;
+        }
+
+        if (i % 20 == 0) {
+            std::vector<Vec3> points;
+            for (uint32_t j = 0; j < 10; ++j) {
+                const float temp_j = static_cast<float>(j) / 10.0f;
+                points.emplace_back(Vec3(
+                    std::sin(temp_j + 0.1f * i),
+                    std::cos(temp_j + 0.1f * i),
+                    std::sin(temp_j + 0.3f * i)
+                ));
+            }
+            logger.RecordPackage(8, points);
         }
 
         usleep(10000);
@@ -313,7 +321,7 @@ void TestPreloadLog(const std::string &log_file_name) {
 int main(int argc, char **argv) {
     ReportInfo(YELLOW ">> Test binary data log decodec." RESET_COLOR);
 
-    const std::string log_file_name = "../output/data.binlog";
+    const std::string log_file_name = "../../Binary_Data_Viewer/examples/data.binlog";
     TestCreateLog(log_file_name);
     TestLoadLog(log_file_name);
     TestPreloadLog(log_file_name);

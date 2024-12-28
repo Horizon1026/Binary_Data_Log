@@ -33,11 +33,11 @@ void BinaryDataLog::CleanUp() {
 }
 
 bool BinaryDataLog::IsDynamicType(uint8_t type_code) {
-    return type_code > static_cast<uint8_t>(ItemType::kDouble);
+    return type_code > static_cast<uint8_t>(ItemType::kPose6Dof);
 }
 
 bool BinaryDataLog::IsDynamicType(ItemType type) {
-    return type > ItemType::kDouble;
+    return type > ItemType::kPose6Dof;
 }
 
 bool BinaryDataLog::CreateLogFile(const std::string &log_file_name) {

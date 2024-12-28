@@ -77,6 +77,14 @@ for each matrix package:
     [12] - [13]: Matrix cols.
     [14] - [n]: Binary data (standard float encode, row major).
 
+for each point cloud package:
+    [10] - [13]: Number of points in cloud.
+    [14] - [17]: Point i position x.
+    [18] - [21]: Point i position y.
+    [22] - [25]: Point i position z.
+    [26] - [29]: Point i + 1 position x.
+    ...
+
 */
 
 using namespace SLAM_UTILITY;
@@ -99,6 +107,7 @@ enum class ItemType : uint8_t {
     kImage = 12,
     kPngImage = 13,
     kMatrix = 14,
+    kPointCloud = 15,
 };
 
 static std::vector<uint32_t> item_type_sizes = {
@@ -117,6 +126,7 @@ static std::vector<uint32_t> item_type_sizes = {
     0,  // kImage.
     0,  // kPngImage.
     0,  // kMatrix.
+    0,  // kPointCloud.
 };
 
 static std::vector<std::string> item_type_strings = {
@@ -135,6 +145,7 @@ static std::vector<std::string> item_type_strings = {
     "kImage",
     "kPngImage",
     "kMatrix",
+    "kPointCloud",
 };
 
 static std::string binary_log_file_header = "BINARY_DATA_LOG";
@@ -147,6 +158,8 @@ struct PackageItemInfo {
 
 struct PackageInfo {
     uint16_t id = 0;
+    // The number of bytes except 10 bytes of package head and 1 byte of sum check.
+    // If this is zero, it means unfixed size. Log decoder should better load only package info but not full bytes.
     uint32_t size = 0;
     std::string name;
     std::vector<PackageItemInfo> items;

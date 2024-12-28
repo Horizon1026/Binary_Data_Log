@@ -35,7 +35,7 @@ bool BinaryDataLog::LoadLogFile(const std::string &log_file_name, bool load_full
     // Check header.
     RETURN_FALSE_IF_FALSE(CheckLogFileHeader());
     // Load all registered packages information.
-    RETURN_FALSE_IF_FALSE(LoadRegisteredPackages());
+    RETURN_FALSE_IF_FALSE(LoadRegisteredPackagesFromFileHead());
     // Load all data.
     timestamp_s_range_of_loaded_log_ = std::make_pair(INFINITY, -INFINITY);
     while (!file_r_ptr_->eof()) {
@@ -71,7 +71,7 @@ bool BinaryDataLog::CheckLogFileHeader() {
     return true;
 }
 
-bool BinaryDataLog::LoadRegisteredPackages() {
+bool BinaryDataLog::LoadRegisteredPackagesFromFileHead() {
     file_r_ptr_->seekg(binary_log_file_header.size());
 
     packages_id_with_objects_.clear();
@@ -167,8 +167,7 @@ bool BinaryDataLog::LoadOnePackage(bool load_full_data) {
     // Check if this data package id is registered.
     const auto it = packages_id_with_objects_.find(package_id);
     if (it == packages_id_with_objects_.end()) {
-        ReportWarn("[DataLog] Load one package data failed. Package id " << package_id <<
-            " is not registered.");
+        ReportWarn("[DataLog] Load one package data failed. Package id " << package_id << " is not registered.");
         // If this is not the end of file, locate to the position of next package.
         if (!file_r_ptr_->eof()) {
             file_r_ptr_->seekg(timestamped_data.index_in_file, std::ios::beg);
@@ -282,6 +281,14 @@ bool BinaryDataLog::LoadOnePackageWithDynamicSize(PackageInfo &package_info,
             break;
         }
 
+        case ItemType::kPointCloud: {
+            uint32_t num_of_points = 0;
+            file_r_ptr_->read(reinterpret_cast<char *>(&num_of_points), 4);
+            data_size = 4 + num_of_points * 3 * sizeof(float);
+            file_r_ptr_->seekg(-4, std::ios::cur);
+            break;
+        }
+
         default:
             return false;
     }
@@ -308,6 +315,7 @@ bool BinaryDataLog::LoadOnePackageWithDynamicSize(PackageInfo &package_info,
     }
     packages.emplace_back(timestamped_data);
 
+    // For package with dynamic size, only store the localtion of data will be better.
     if (load_full_data) {
         packages.back().data.reserve(data_size);
         for (uint32_t i = 0; i < data_size; ++i) {
