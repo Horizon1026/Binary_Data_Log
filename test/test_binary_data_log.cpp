@@ -137,6 +137,18 @@ void RegisterAllPackages(BinaryDataLog &logger) {
             ReportError("Test failed: register a new package.");
         }
     }
+    {
+        std::unique_ptr<PackageInfo> package_ptr = std::make_unique<PackageInfo>();
+        package_ptr->id = 7;
+        package_ptr->name = "random matrix";
+        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kMatrix, .name = "matrix"});
+
+        if (logger.RegisterPackage(package_ptr)) {
+            ReportInfo("Register a new package.");
+        } else {
+            ReportError("Test failed: register a new package.");
+        }
+    }
 }
 
 void TestCreateLog(const std::string &log_file_name) {
@@ -208,6 +220,10 @@ void TestCreateLog(const std::string &log_file_name) {
             std::vector<uint8_t> png_image;
             Visualizor2D::SaveToPngImageData(rgb_image, png_image);
             logger.RecordPackage(6, png_image, ItemType::kPngImage);
+
+            // Record random matrix.
+            const Mat random_matrix = Mat::Random(80, 60);
+            logger.RecordPackage(7, random_matrix);
 
             ++idx_of_image_file;
         }

@@ -208,7 +208,7 @@ void BinaryDataLog::ReportAllLoadedPackages() {
                     ReportText(static_cast<int32_t>(package_data_per_tick.data[i]) << " ");
                 }
                 if (kMaxPrintBytesForEachItem < num_of_bytes_in_item) {
-                    ReportText(" ...(" << num_of_bytes_in_item << " bytes)");
+                    ReportText("... (" << num_of_bytes_in_item << " bytes)");
                 }
             }
             ReportText(std::endl);
