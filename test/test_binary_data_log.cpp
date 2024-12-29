@@ -259,8 +259,11 @@ void TestCreateLog(const std::string &log_file_name) {
             logger.RecordPackage(4, rgb_image, timestamp);
 
             // Record matrix.
-            const Mat random_matrix = Mat::Random(80, 120);
-            logger.RecordPackage(5, random_matrix, timestamp);
+            Mat matrix = Mat::Random(80, 120);
+            for (int32_t i = 0; i < 80; ++i) {
+                matrix(i, i) = i;
+            }
+            logger.RecordPackage(5, matrix, timestamp);
 
             // Record png image.
             std::vector<uint8_t> png_image;
