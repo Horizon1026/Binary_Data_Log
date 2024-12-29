@@ -18,7 +18,7 @@ uint8_t *BinaryDataLog::LoadBinaryDataFromLogFile(uint64_t index_in_file, uint32
     return buff;
 }
 
-bool BinaryDataLog::LoadLogFile(const std::string &log_file_name, bool load_full_data) {
+bool BinaryDataLog::LoadLogFile(const std::string &log_file_name, bool load_dynamic_package_full_data) {
     // If last log file is not closed, close it.
     if (file_r_ptr_ != nullptr) {
         file_r_ptr_->close();
@@ -50,7 +50,7 @@ bool BinaryDataLog::LoadLogFile(const std::string &log_file_name, bool load_full
         }
 
         // If one package is broken in this file, skip it and continue loading.
-        LoadOnePackage(load_full_data);
+        LoadOnePackage(load_dynamic_package_full_data);
     }
 
     // Reopen this log file. If not do this, the belowing 'LoadBinaryDataFromLogFile' will make error.
@@ -145,7 +145,7 @@ bool BinaryDataLog::LoadRegisteredPackagesFromFileHead() {
     return true;
 }
 
-bool BinaryDataLog::LoadOnePackage(bool load_full_data) {
+bool BinaryDataLog::LoadOnePackage(bool load_dynamic_package_full_data) {
     // Record the index in log file.
     PackageDataPerTick timestamped_data;
     timestamped_data.index_in_file = file_r_ptr_->tellg();
@@ -187,7 +187,7 @@ bool BinaryDataLog::LoadOnePackage(bool load_full_data) {
     const uint32_t data_size = it->second->size;
     bool load_result = true;
     if (data_size == 0) {
-        load_result = LoadOnePackageWithDynamicSize(*(it->second), sum_check_byte, timestamped_data, package_id, load_full_data);
+        load_result = LoadOnePackageWithDynamicSize(*(it->second), sum_check_byte, timestamped_data, package_id, load_dynamic_package_full_data);
     } else {
         load_result = LoadOnePackageWithStaticSize(sum_check_byte, timestamped_data, package_id, data_size, true);
     }

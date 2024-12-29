@@ -212,7 +212,8 @@ void TestCreateLog(const std::string &log_file_name) {
     uint32_t idx_of_image_file = 0;
 
     // Record data.
-    for (uint32_t i = 0; i < 100; ++i) {
+    for (uint32_t i = 0; i < 200; ++i) {
+        const float timestamp = static_cast<float>(i) * 0.2f;
         const float temp = static_cast<float>(i) / 15.0f;
         ImuData imu_data {
             .gyro_x = - std::sin(temp + 0.34f),
@@ -223,14 +224,14 @@ void TestCreateLog(const std::string &log_file_name) {
             .accel_z = std::sin(1.25f * temp + 0.6f),
             .valid = i > 50,
         };
-        logger.RecordPackage(1, reinterpret_cast<const char *>(&imu_data));
+        logger.RecordPackage(1, reinterpret_cast<const char *>(&imu_data), timestamp);
 
         BaroData baro_data {
             .press = i * 2,
             .height = static_cast<float>(i * i),
             .valid = i < 30,
         };
-        logger.RecordPackage(2, reinterpret_cast<const char *>(&baro_data));
+        logger.RecordPackage(2, reinterpret_cast<const char *>(&baro_data), timestamp);
 
         StateData state_data {
             .is_vel_valid = i > 50,
@@ -246,40 +247,40 @@ void TestCreateLog(const std::string &log_file_name) {
             .atti_y = 0.0f,
             .atti_z = 0.0f,
         };
-        logger.RecordPackage(7, reinterpret_cast<const char *>(&state_data));
+        logger.RecordPackage(7, reinterpret_cast<const char *>(&state_data), timestamp);
 
-        if (i % (100 / max_idx_of_image_file) == 0 && idx_of_image_file < max_idx_of_image_file) {
+        if (i % (200 / max_idx_of_image_file) == 0 && idx_of_image_file < max_idx_of_image_file) {
             // Record image.
             GrayImage gray_image;
             Visualizor2D::LoadImage(image_filenames[idx_of_image_file], gray_image);
-            logger.RecordPackage(3, gray_image);
+            logger.RecordPackage(3, gray_image, timestamp);
             RgbImage rgb_image;
             Visualizor2D::LoadImage(image_filenames[idx_of_image_file], rgb_image);
-            logger.RecordPackage(4, rgb_image);
+            logger.RecordPackage(4, rgb_image, timestamp);
 
             // Record matrix.
             const Mat random_matrix = Mat::Random(80, 120);
-            logger.RecordPackage(5, random_matrix);
+            logger.RecordPackage(5, random_matrix, timestamp);
 
             // Record png image.
             std::vector<uint8_t> png_image;
             Visualizor2D::SaveToPngImageData(rgb_image, png_image);
-            logger.RecordPackage(6, png_image, ItemType::kPngImage);
+            logger.RecordPackage(6, png_image, ItemType::kPngImage, timestamp);
 
             ++idx_of_image_file;
         }
 
         if (i % 20 == 0) {
             std::vector<Vec3> points;
-            for (uint32_t j = 0; j < 10; ++j) {
+            for (uint32_t j = 0; j < 40; ++j) {
                 const float temp_j = static_cast<float>(j) / 10.0f;
                 points.emplace_back(Vec3(
-                    std::sin(temp_j + 0.1f * i),
-                    std::cos(temp_j + 0.1f * i),
+                    std::sin(temp_j + 0.15f * i),
+                    std::cos(temp_j + 0.1f * i + 0.2f),
                     std::sin(temp_j + 0.3f * i)
                 ));
             }
-            logger.RecordPackage(8, points);
+            logger.RecordPackage(8, points, timestamp);
         }
 
         usleep(10000);
