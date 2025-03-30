@@ -46,6 +46,7 @@ public:
     // Support for decoder.
     bool LoadLogFile(const std::string &log_file_name, bool load_dynamic_package_full_data = false);
     template <typename T> static T ConvertBytes(const uint8_t *bytes, ItemType type);
+    template <typename T> static T ConvertBytesOfQuaternionToEuler(const uint8_t *bytes, ItemType type, int32_t ypr_idx = 0);
     uint8_t *LoadBinaryDataFromLogFile(uint64_t index_in_file, uint32_t size);
 
     // Support for information.
@@ -157,6 +158,36 @@ T BinaryDataLog::ConvertBytes(const uint8_t *bytes, ItemType type) {
         case ItemType::kDouble: {
             const double *data_ptr = reinterpret_cast<const double *>(bytes);
             return static_cast<T>(*data_ptr);
+        }
+        default:
+            return static_cast<T>(0);
+    }
+}
+
+template <typename T>
+T BinaryDataLog::ConvertBytesOfQuaternionToEuler(const uint8_t *bytes, ItemType type, int32_t ypr_idx) {
+    switch (type) {
+        case ItemType::kFloat: {
+            constexpr float kRadToDeg = 57.295779579f;
+            const float *data_ptr = reinterpret_cast<const float *>(bytes);
+            const float *q = data_ptr;
+            float euler = 0.0f;
+            switch (ypr_idx) {
+                case 0: {
+                    euler = std::atan2(2.0f * (q[0] * q[1] + q[2] * q[3]), 1.0f - 2.0f * (q[1] * q[1] + q[2] * q[2])) * kRadToDeg;
+                    break;
+                }
+                case 1: {
+                    euler = std::asin(2.0f * (q[0] * q[2] - q[3] * q[1])) * kRadToDeg;
+                    break;
+                }
+                case 2: {
+                    euler = std::atan2(2.0f * (q[0] * q[3] + q[1] * q[2]), 1.0f - 2.0f * (q[2] * q[2] + q[3] * q[3])) * kRadToDeg;
+                    break;
+                }
+                default: break;
+            }
+            return static_cast<T>(euler);
         }
         default:
             return static_cast<T>(0);
