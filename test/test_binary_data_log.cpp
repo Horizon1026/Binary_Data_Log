@@ -76,12 +76,8 @@ void RegisterAllPackages(BinaryDataLog &logger) {
         std::unique_ptr<PackageInfo> package_ptr = std::make_unique<PackageInfo>();
         package_ptr->id = 1;
         package_ptr->name = "imu";
-        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kFloat, .name = "gyro_x"});
-        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kFloat, .name = "gyro_y"});
-        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kFloat, .name = "gyro_z"});
-        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kFloat, .name = "accel_x"});
-        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kFloat, .name = "accel_y"});
-        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kFloat, .name = "accel_z"});
+        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kVector3, .name = "gyro"});
+        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kVector3, .name = "accel"});
         package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kUint8, .name = "valid"});
 
         if (logger.RegisterPackage(package_ptr)) {
