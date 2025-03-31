@@ -148,6 +148,15 @@ static std::vector<std::string> item_type_strings = {
     "kPointCloud",
 };
 
+enum class DecodeType : uint8_t {
+    kGeneral = 0,
+    kQuaternionToPitch = 1,
+    kQuaternionToRoll = 2,
+    kQuaternionToYaw = 3,
+    kVector2dToMod = 4,
+    kVector3dToMod = 5,
+};
+
 static std::string binary_log_file_header = "BINARY_DATA_LOG";
 
 struct PackageItemInfo {
