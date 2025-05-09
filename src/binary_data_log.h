@@ -59,7 +59,7 @@ public:
     // Const Reference for member variables.
     // Support for decodec.
     const std::unique_ptr<std::ifstream> &file_r_ptr() const { return file_r_ptr_; }
-    const std::unordered_map<uint16_t, std::unique_ptr<PackageInfo>> &packages_id_with_objects() const { return packages_id_with_objects_; }
+    const std::map<uint16_t, std::unique_ptr<PackageInfo>> &packages_id_with_objects() const { return packages_id_with_objects_; }
     const std::pair<float, float> &timestamp_s_range_of_loaded_log() const { return timestamp_s_range_of_loaded_log_; }
     // Support for recorder.
     const std::unique_ptr<std::fstream> &file_w_ptr() const { return file_w_ptr_; }
@@ -104,7 +104,7 @@ private:
 private:
     // Support for decodec.
     std::unique_ptr<std::ifstream> file_r_ptr_ = nullptr;
-    std::unordered_map<uint16_t, std::unique_ptr<PackageInfo>> packages_id_with_objects_;
+    std::map<uint16_t, std::unique_ptr<PackageInfo>> packages_id_with_objects_;
     std::pair<float, float> timestamp_s_range_of_loaded_log_ = std::make_pair(0, 0);
 
     // Support for recorder.
