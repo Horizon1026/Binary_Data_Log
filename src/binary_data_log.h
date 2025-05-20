@@ -2,6 +2,7 @@
 #define _BINARY_DATA_LOG_H_
 
 #include "binary_data_log_file_protocal.h"
+#include "binary_data_log_basic_type.h"
 #include "datatype_image.h"
 
 #include "iostream"
