@@ -75,7 +75,7 @@ bool BinaryDataLog::RegisterPackage(std::unique_ptr<PackageInfo> &new_package) {
 
     // If one of items in package has dynamic size, this package should only have one item.
     if (package_info_ptr->items.size() > 1) {
-        for (const auto &item : package_info_ptr->items) {
+        for (const auto &item: package_info_ptr->items) {
             if (item.type > ItemType::kPose6Dof) {
                 ReportError("[DataLog] If one of items in package has dynamic size, this package should only have one item.");
                 return false;
@@ -95,7 +95,7 @@ bool BinaryDataLog::RegisterPackage(std::unique_ptr<PackageInfo> &new_package) {
 
     // Statis the whole size of binary data in this package.
     package_info_ptr->size = 0;
-    for (const auto &item : package_info_ptr->items) {
+    for (const auto &item: package_info_ptr->items) {
         package_info_ptr->size += item_type_sizes[static_cast<uint32_t>(item.type)];
     }
 
@@ -132,12 +132,12 @@ std::string BinaryDataLog::LoadStringFromBinaryFile(uint32_t size) {
 
 void BinaryDataLog::ReportAllRegisteredPackages() {
     ReportColorInfo("[DataLog] Report all registered packages information:");
-    for (const auto &pair : packages_id_with_objects_) {
+    for (const auto &pair: packages_id_with_objects_) {
         const auto &package = pair.second;
         ReportColorInfo(">> Package name : " << package->name);
         ReportInfo("   Package id : " << package->id);
         ReportInfo("   Package items : [type | data_index_in_package_data | name]");
-        for (const auto &item : package->items) {
+        for (const auto &item: package->items) {
             ReportInfo("      " << item_type_strings[static_cast<uint32_t>(item.type)] << " | " <<
                 item.bindata_index_in_package << " | " << item.name);
         }
@@ -147,7 +147,7 @@ void BinaryDataLog::ReportAllRegisteredPackages() {
 void BinaryDataLog::ReportAllLoadedPackages() {
     ReportColorInfo("[DataLog] Report all loaded packages binary data between " << timestamp_s_range_of_loaded_log_.first <<
         "s to " << timestamp_s_range_of_loaded_log_.second << "s:");
-    for (const auto &package : packages_id_with_data_) {
+    for (const auto &package: packages_id_with_data_) {
         const auto it = packages_id_with_objects_.find(package.first);
         if (it == packages_id_with_objects_.end()) {
             ReportError("[DataLog] packages_id_with_data_ is not matching with packages_id_with_objects_.");
@@ -163,7 +163,7 @@ void BinaryDataLog::ReportAllLoadedPackages() {
         const auto &first_item_type = items_info.front().type;
 
         ReportColorInfo(">> Package id : " << package.first << ", context [ time(ms) | index_in_log_file | size_of_all_in_file | bindata ] :");
-        for (const auto &package_data_per_tick : package.second) {
+        for (const auto &package_data_per_tick: package.second) {
             ReportText(GREEN "[Info ] " RESET_COLOR "      " << package_data_per_tick.timestamp_s << " | ");
             ReportText(package_data_per_tick.index_in_file << " | ");
             ReportText(package_data_per_tick.size_of_all_in_file << " | ");

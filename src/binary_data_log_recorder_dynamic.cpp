@@ -209,7 +209,7 @@ bool BinaryDataLog::RecordPackage(const uint16_t package_id, const std::vector<V
     file_w_ptr_->write(reinterpret_cast<const char *>(&num_of_points), 4);
     sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&num_of_points), 4, sum_check_byte);
     // Iterate points cloud, directly write all data bytes.
-    for (const auto &point : points_cloud) {
+    for (const auto &point: points_cloud) {
         for (uint32_t i = 0; i < 3; ++i) {
             file_w_ptr_->write(reinterpret_cast<const char *>(&point[i]), 4);
             sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&point[i]), 4, sum_check_byte);

@@ -14,7 +14,7 @@ bool BinaryDataLog::RecordAllRegisteredPackagesAsFileHead() {
 
     // Statis the whole size.
     std::vector<uint32_t> offsets(1, 4);
-    for (const auto &pair : packages_id_with_objects_) {
+    for (const auto &pair: packages_id_with_objects_) {
         const auto &package = pair.second;
 
         uint32_t offset_to_next_package = 4;    // Offset itself.
@@ -22,7 +22,7 @@ bool BinaryDataLog::RecordAllRegisteredPackagesAsFileHead() {
         offset_to_next_package += 1;    // Length of package name string.
         offset_to_next_package += package->name.size();
 
-        for (const auto &item : package->items) {
+        for (const auto &item: package->items) {
             offset_to_next_package += 1;    // Type of item.
             offset_to_next_package += 1;    // Length of item name string.
             offset_to_next_package += item.name.size();
@@ -40,7 +40,7 @@ bool BinaryDataLog::RecordAllRegisteredPackagesAsFileHead() {
 
     // Iterate each package.
     uint32_t index = 1;
-    for (auto &pair : packages_id_with_objects_) {
+    for (auto &pair: packages_id_with_objects_) {
         auto &package = pair.second;
 
         // Write the offset index to the next package name.
@@ -59,7 +59,7 @@ bool BinaryDataLog::RecordAllRegisteredPackagesAsFileHead() {
         sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(package->name.c_str()), package->name.size(), sum_check_byte);
 
         // Iterate each item of this package.
-        for (auto &item : package->items) {
+        for (auto &item: package->items) {
             // Write the type of item.
             file_w_ptr_->write(reinterpret_cast<const char *>(&item.type), 1);
             sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&item.type), 1, sum_check_byte);
