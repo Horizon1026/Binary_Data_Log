@@ -63,7 +63,7 @@ bool BinaryDataLog::CheckLogFileHeader() {
     file_r_ptr_->seekg(0);
 
     std::string temp_header = binary_log_file_header;
-    file_r_ptr_->read(temp_header.data(), binary_log_file_header.size());
+    file_r_ptr_->read(const_cast<char *>(temp_header.data()), binary_log_file_header.size());
     if (temp_header != binary_log_file_header) {
         ReportWarn("[DataLog] Log header error, it cannot be decoded.");
         return false;
@@ -89,7 +89,7 @@ bool BinaryDataLog::LoadRegisteredPackagesFromFileHead() {
         // Load offset to the next package.
         uint32_t offset_to_next_package = 0;
         file_r_ptr_->read(reinterpret_cast<char *>(&offset_to_next_package), 4);
-        uint8_t sum_check_byte = SummaryBytes(reinterpret_cast<uint8_t *>(&offset_to_next_package), 4, 0);
+        uint8_t sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&offset_to_next_package), 4, 0);
 
         offset += offset_to_next_package;
 
@@ -97,14 +97,14 @@ bool BinaryDataLog::LoadRegisteredPackagesFromFileHead() {
         // Load package id.
         std::unique_ptr<PackageInfo> package_ptr = std::make_unique<PackageInfo>();
         file_r_ptr_->read(reinterpret_cast<char *>(&package_ptr->id), 2);
-        sum_check_byte = SummaryBytes(reinterpret_cast<uint8_t *>(&package_ptr->id), 2, sum_check_byte);
+        sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&package_ptr->id), 2, sum_check_byte);
         // Load package name length.
         uint8_t package_name_length = 0;
         file_r_ptr_->read(reinterpret_cast<char *>(&package_name_length), 1);
-        sum_check_byte = SummaryBytes(reinterpret_cast<uint8_t *>(&package_name_length), 1, sum_check_byte);
+        sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&package_name_length), 1, sum_check_byte);
         // Load package name.
         package_ptr->name = LoadStringFromBinaryFile(package_name_length);
-        sum_check_byte = SummaryBytes(reinterpret_cast<uint8_t *>(package_ptr->name.data()), package_name_length, sum_check_byte);
+        sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(package_ptr->name.data()), package_name_length, sum_check_byte);
 
         uint32_t offset_in_package = 4 + 2 + 1 + package_name_length + 1;
         uint32_t item_data_index_in_package_data = 0;
@@ -116,15 +116,15 @@ bool BinaryDataLog::LoadRegisteredPackagesFromFileHead() {
             // Load information of an item.
             // Load item type.
             file_r_ptr_->read(reinterpret_cast<char *>(&new_item.type), 1);
-            sum_check_byte = SummaryBytes(reinterpret_cast<uint8_t *>(&new_item.type), 1, sum_check_byte);
+            sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&new_item.type), 1, sum_check_byte);
             item_data_index_in_package_data += item_type_sizes[static_cast<uint32_t>(new_item.type)];
             // Load item name length.
             uint8_t item_name_length = 0;
             file_r_ptr_->read(reinterpret_cast<char *>(&item_name_length), 1);
-            sum_check_byte = SummaryBytes(reinterpret_cast<uint8_t *>(&item_name_length), 1, sum_check_byte);
+            sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&item_name_length), 1, sum_check_byte);
             // Load item name.
             new_item.name = LoadStringFromBinaryFile(item_name_length);
-            sum_check_byte = SummaryBytes(reinterpret_cast<uint8_t *>(new_item.name.data()), item_name_length, sum_check_byte);
+            sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(new_item.name.data()), item_name_length, sum_check_byte);
 
             offset_in_package += item_name_length + 2;
         }
@@ -153,7 +153,7 @@ bool BinaryDataLog::LoadOnePackage(bool load_dynamic_package_full_data) {
     // Load offset to the next content.
     uint32_t offset_to_next_content = 0;
     file_r_ptr_->read(reinterpret_cast<char *>(&offset_to_next_content), 4);
-    uint8_t sum_check_byte = SummaryBytes(reinterpret_cast<uint8_t *>(&offset_to_next_content), 4, 0);
+    uint8_t sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&offset_to_next_content), 4, 0);
     timestamped_data.size_of_all_in_file = offset_to_next_content;
 
     // Check if this is the end of log file.
@@ -162,7 +162,7 @@ bool BinaryDataLog::LoadOnePackage(bool load_dynamic_package_full_data) {
     // Load package id.
     uint16_t package_id = 0;
     file_r_ptr_->read(reinterpret_cast<char *>(&package_id), 2);
-    sum_check_byte = SummaryBytes(reinterpret_cast<uint8_t *>(&package_id), 2, sum_check_byte);
+    sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&package_id), 2, sum_check_byte);
 
     // Check if this data package id is registered.
     const auto it = packages_id_with_objects_.find(package_id);
@@ -178,7 +178,7 @@ bool BinaryDataLog::LoadOnePackage(bool load_dynamic_package_full_data) {
 
     // Load system timestamp.
     file_r_ptr_->read(reinterpret_cast<char *>(&timestamped_data.timestamp_s), 4);
-    sum_check_byte = SummaryBytes(reinterpret_cast<uint8_t *>(&timestamped_data.timestamp_s), 4, sum_check_byte);
+    sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&timestamped_data.timestamp_s), 4, sum_check_byte);
     // Update timestamp range.
     timestamp_s_range_of_loaded_log_.first = std::min(timestamp_s_range_of_loaded_log_.first, timestamped_data.timestamp_s);
     timestamp_s_range_of_loaded_log_.second = std::max(timestamp_s_range_of_loaded_log_.second, timestamped_data.timestamp_s);
@@ -210,7 +210,7 @@ bool BinaryDataLog::LoadOnePackageWithStaticSize(uint8_t &sum_check_byte,
                                                  bool load_full_data) {
     char *buffer = new char[data_size];
     file_r_ptr_->read(buffer, data_size);
-    sum_check_byte = SummaryBytes(reinterpret_cast<uint8_t *>(buffer), data_size, sum_check_byte);
+    sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(buffer), data_size, sum_check_byte);
 
     // Check summary byte.
     uint8_t loaded_sum_check_byte = 0;
@@ -298,7 +298,7 @@ bool BinaryDataLog::LoadOnePackageWithDynamicSize(PackageInfo &package_info,
     RETURN_FALSE_IF(data_size < 1);
     char *buffer = new char[data_size];
     file_r_ptr_->read(buffer, data_size);
-    sum_check_byte = SummaryBytes(reinterpret_cast<uint8_t *>(buffer), data_size, sum_check_byte);
+    sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(buffer), data_size, sum_check_byte);
 
     // Check summary byte.
     uint8_t loaded_sum_check_byte = 0;
