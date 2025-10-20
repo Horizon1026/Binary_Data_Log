@@ -175,11 +175,19 @@ bool BinaryDataLog::RecordPackage(const uint16_t package_id, const std::vector<u
 }
 
 bool BinaryDataLog::RecordPackage(const uint16_t package_id, const std::vector<Vec3> &points_cloud) {
-    return RecordPackage(package_id, points_cloud, GetSystemTimestamp());
+    return RecordPackage(package_id, points_cloud, 1);
 }
 
 bool BinaryDataLog::RecordPackage(const uint16_t package_id, const std::vector<Vec3> &points_cloud, const float time_stamp_s) {
-    RETURN_FALSE_IF(points_cloud.empty());
+    return RecordPackage(package_id, points_cloud, 1, time_stamp_s);
+}
+
+bool BinaryDataLog::RecordPackage(const uint16_t package_id, const std::vector<Vec3> &points_cloud, const int32_t step) {
+    return RecordPackage(package_id, points_cloud, GetSystemTimestamp(), step);
+}
+
+bool BinaryDataLog::RecordPackage(const uint16_t package_id, const std::vector<Vec3> &points_cloud, const int32_t step, const float time_stamp_s) {
+    RETURN_FALSE_IF(points_cloud.empty() || step < 1);
 
     const auto it = packages_id_with_objects_.find(package_id);
     if (it == packages_id_with_objects_.end()) {
@@ -188,7 +196,7 @@ bool BinaryDataLog::RecordPackage(const uint16_t package_id, const std::vector<V
     }
 
     // Check png image size.
-    const uint32_t num_of_points = static_cast<uint32_t>(points_cloud.size());
+    const uint32_t num_of_points = static_cast<uint32_t>(points_cloud.size()) / step;
     const uint32_t point_cloud_data_size = 4 + num_of_points * 3 * sizeof(float);
 
     // Write the offset to the next package data.
@@ -209,11 +217,15 @@ bool BinaryDataLog::RecordPackage(const uint16_t package_id, const std::vector<V
     file_w_ptr_->write(reinterpret_cast<const char *>(&num_of_points), 4);
     sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&num_of_points), 4, sum_check_byte);
     // Iterate points cloud, directly write all data bytes.
-    for (const auto &point: points_cloud) {
+    uint32_t cnt = 0;
+    for (uint32_t id = 0; id < points_cloud.size(); id += step) {
+        const auto &point = points_cloud[id];
         for (uint32_t i = 0; i < 3; ++i) {
             file_w_ptr_->write(reinterpret_cast<const char *>(&point[i]), 4);
             sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&point[i]), 4, sum_check_byte);
         }
+        ++cnt;
+        BREAK_IF(cnt >= num_of_points);
     }
 
     // Write the summary check byte.
