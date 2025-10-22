@@ -33,3 +33,13 @@ target_link_libraries( test_binary_data_log
     lib_2d_visualizor
     lib_stack_backward
 )
+
+# Create executable target to test csv_to_binlog.
+add_executable( test_csv_file_to_binlog
+    test/test_csv_file_to_binlog.cpp
+)
+target_link_libraries( test_csv_file_to_binlog
+    lib_binary_data_log
+    lib_2d_visualizor
+    lib_stack_backward
+)
