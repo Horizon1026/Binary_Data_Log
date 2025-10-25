@@ -245,7 +245,7 @@ void TestCreateLog(const std::string &log_file_name) {
         };
         logger.RecordPackage(7, reinterpret_cast<const char *>(&state_data), timestamp);
 
-        if (i % (200 / max_idx_of_image_file) == 0 && idx_of_image_file < max_idx_of_image_file) {
+        if (i % (200 / max_idx_of_image_file) == 0 && idx_of_image_file < max_idx_of_image_file && image_filenames[idx_of_image_file].find(".png") != std::string::npos) {
             // Record image.
             GrayImage gray_image;
             Visualizor2D::LoadImage(image_filenames[idx_of_image_file], gray_image);
