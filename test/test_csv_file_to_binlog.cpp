@@ -189,7 +189,7 @@ int main(int argc, char **argv) {
             temp_str.erase(std::remove(temp_str.begin(), temp_str.end(), ' '), temp_str.end());
             values.emplace_back(std::stod(temp_str));
         }
-        CONTINUE_IF(values.size() != csv_header_items.size() - 1);
+        CONTINUE_IF(values.size() != csv_header_items.size());
         static double time_stamp_offset_s = values[time_stamp_index];
 
         for (const auto &package: csv_header_items_map) {
