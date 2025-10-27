@@ -34,12 +34,18 @@ int main(int argc, char **argv) {
     std::istringstream csv_header_stream(csv_header);
     std::string temp_str;
     while (std::getline(csv_header_stream, temp_str, ',')) {
+        temp_str.erase(std::remove(temp_str.begin(), temp_str.end(), ' '), temp_str.end());
         csv_header_items.push_back(temp_str);
     }
     // Find the index of "time_stamp_s".
     int32_t time_stamp_index = -1;
     double time_stamp_scale = 1.0;
     for (uint32_t i = 0; i < csv_header_items.size(); i++) {
+        if (csv_header_items[i] == "timestamp") {
+            time_stamp_index = i;
+            time_stamp_scale = 1e-6;
+            break;
+        }
         if (csv_header_items[i].find("time_stamp_s") != std::string::npos) {
             time_stamp_index = i;
             time_stamp_scale = 1.0;
@@ -125,6 +131,7 @@ int main(int argc, char **argv) {
         ReportError("Timestamp index not found in csv file: " + csv_file);
         return 1;
     }
+    ReportInfo("Time stamp index found in csv file: " << time_stamp_index << " [name][" << csv_header_items[time_stamp_index] << "] [scale][" << time_stamp_scale << "]");
 
     // Parse csv header items into csv_header_items_map.
     // csv_header_items_map[package_name][item_name] = item_index;
@@ -135,16 +142,15 @@ int main(int argc, char **argv) {
         const std::string package_name = temp_package_name.size() == csv_header_items[i].size() ? "default_package" : temp_package_name;
 
         if (static_cast<int32_t>(i) == time_stamp_index) {
-            ReportInfo("Time stamp index found in csv file: " << time_stamp_index);
             continue;
         }
         csv_header_items_map[package_name].emplace_back(std::make_pair(item_name, i));
     }
     ReportInfo("Succeed to parse csv header items into binlog header:");
     for (const auto &package: csv_header_items_map) {
-        ReportInfo("    Package [name][" << package.first << "] [id][" << package.second.begin()->second << "]");
+        ReportInfo(">> Package [name][" << package.first << "] [id][" << package.second.begin()->second << "]");
         for (const auto &item: package.second) {
-            ReportInfo("        Item [name][" << item.first << "] [col index][" << item.second << "]");
+            ReportInfo("   - Item [name][" << item.first << "] [col index][" << item.second << "]");
         }
     }
 
@@ -180,8 +186,10 @@ int main(int argc, char **argv) {
         std::string temp_str;
         std::vector<double> values;
         while (std::getline(csv_line_stream, temp_str, ',')) {
+            temp_str.erase(std::remove(temp_str.begin(), temp_str.end(), ' '), temp_str.end());
             values.emplace_back(std::stod(temp_str));
         }
+        CONTINUE_IF(values.size() != csv_header_items.size() - 1);
         static double time_stamp_offset_s = values[time_stamp_index];
 
         for (const auto &package: csv_header_items_map) {
