@@ -35,7 +35,8 @@ int main(int argc, char **argv) {
     std::string temp_str;
     while (std::getline(csv_header_stream, temp_str, ',')) {
         temp_str.erase(std::remove(temp_str.begin(), temp_str.end(), ' '), temp_str.end());
-        csv_header_items.push_back(temp_str);
+        CONTINUE_IF(temp_str.empty());
+        csv_header_items.emplace_back(temp_str);
     }
     // Find the index of "time_stamp_s".
     int32_t time_stamp_index = -1;
@@ -140,10 +141,8 @@ int main(int argc, char **argv) {
         const std::string temp_package_name = csv_header_items[i].substr(0, csv_header_items[i].find('/'));
         const std::string item_name = csv_header_items[i].substr(csv_header_items[i].find('/') + 1);
         const std::string package_name = temp_package_name.size() == csv_header_items[i].size() ? "default_package" : temp_package_name;
-
-        if (static_cast<int32_t>(i) == time_stamp_index) {
-            continue;
-        }
+        CONTINUE_IF(item_name.empty());
+        CONTINUE_IF(static_cast<int32_t>(i) == time_stamp_index);
         csv_header_items_map[package_name].emplace_back(std::make_pair(item_name, i));
     }
     ReportInfo("Succeed to parse csv header items into binlog header:");
@@ -187,6 +186,7 @@ int main(int argc, char **argv) {
         std::vector<double> values;
         while (std::getline(csv_line_stream, temp_str, ',')) {
             temp_str.erase(std::remove(temp_str.begin(), temp_str.end(), ' '), temp_str.end());
+            CONTINUE_IF(temp_str.empty());
             values.emplace_back(std::stod(temp_str));
         }
         CONTINUE_IF(values.size() != csv_header_items.size());
