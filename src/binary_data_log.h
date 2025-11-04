@@ -45,6 +45,7 @@ public:
     bool RecordPackage(const uint16_t package_id, const std::vector<Vec3> &points_cloud, const float time_stamp_s);
     bool RecordPackage(const uint16_t package_id, const std::vector<Vec3> &points_cloud, const int32_t step);
     bool RecordPackage(const uint16_t package_id, const std::vector<Vec3> &points_cloud, const int32_t step, const float time_stamp_s);
+    static bool CreateLogFileByCsvFile(const std::string &csv_file_name, const std::string &log_file_name = "data.binlog");
 
     // Support for decoder.
     bool LoadLogFile(const std::string &log_file_name, bool load_dynamic_package_full_data = false);
