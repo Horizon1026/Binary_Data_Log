@@ -161,10 +161,45 @@ bool BinaryDataLog::CreateLogFileByCsvFile(const std::string &csv_file_name, con
     // Register packages to log recorder.
     for (const auto &package: csv_header_items_map) {
         std::unique_ptr<PackageInfo> package_ptr = std::make_unique<PackageInfo>();
-        package_ptr->id = package.second.begin()->second;
+        const auto &items = package.second;
+        package_ptr->id = items.begin()->second;
         package_ptr->name = package.first;
-        for (const auto &item : package.second) {
-            package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kFloat, .name = item.first});
+        for (int32_t i = 0; i < static_cast<int32_t>(items.size()); i++) {
+            if (i < static_cast<int32_t>(items.size()) - 6) {
+                if (items[i].first.back() == 'x' && items[i + 1].first.back() == 'y' && items[i + 2].first.back() == 'z' &&
+                    items[i + 3].first.back() == 'w' && items[i + 4].first.back() == 'x' && items[i + 5].first.back() == 'y' && items[i + 6].first.back() == 'z') {
+                    CONTINUE_IF(items[i].first.front() != 'p' || items[i + 3].first.front() != 'q');
+                    std::string quat_item_name = items[i].first;
+                    if (quat_item_name.size() <= 2) {
+                        quat_item_name = "Transform";
+                    } else if (quat_item_name[quat_item_name.size() - 2] == '_') {
+                        quat_item_name = quat_item_name.substr(0, quat_item_name.size() - 2);
+                        quat_item_name[0] = 'T';
+                    } else {
+                        quat_item_name = quat_item_name.substr(0, quat_item_name.size() - 1);
+                        quat_item_name[0] = 'T';
+                    }
+                    package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kPose6Dof, .name = quat_item_name});
+                    i += 6;
+                    continue;
+                }
+            }
+            if (i < static_cast<int32_t>(items.size()) - 2) {
+                if (items[i].first.back() == 'x' && items[i + 1].first.back() == 'y' && items[i + 2].first.back() == 'z') {
+                    std::string vector3_item_name = items[i].first;
+                    if (vector3_item_name.size() <= 2) {
+                        vector3_item_name = "vector3";
+                    } else if (vector3_item_name[vector3_item_name.size() - 2] == '_') {
+                        vector3_item_name = vector3_item_name.substr(0, vector3_item_name.size() - 2);
+                    } else {
+                        vector3_item_name = vector3_item_name.substr(0, vector3_item_name.size() - 1);
+                    }
+                    package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kVector3, .name = vector3_item_name});
+                    i += 2;
+                    continue;
+                }
+            }
+            package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kFloat, .name = items[i].first});
         }
         if (!log_recorder.RegisterPackage(package_ptr)) {
             ReportError("[DataLog] Failed to register package: " + package.first);
