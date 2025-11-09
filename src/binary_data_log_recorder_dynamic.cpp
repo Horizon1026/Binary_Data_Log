@@ -1,6 +1,6 @@
 #include "binary_data_log.h"
-#include "slam_operations.h"
 #include "slam_log_reporter.h"
+#include "slam_operations.h"
 
 #include "chrono"
 
@@ -22,11 +22,7 @@ bool BinaryDataLog::RecordPackage(const uint16_t package_id, const RgbImage &ima
     return RecordImage(package_id, 3, image.rows(), image.cols(), image.data(), GetSystemTimestamp());
 }
 
-bool BinaryDataLog::RecordImage(const uint16_t package_id,
-                                const int32_t channels,
-                                const int32_t image_rows,
-                                const int32_t image_cols,
-                                const uint8_t *data_ptr,
+bool BinaryDataLog::RecordImage(const uint16_t package_id, const int32_t channels, const int32_t image_rows, const int32_t image_cols, const uint8_t *data_ptr,
                                 const float time_stamp_s) {
     RETURN_FALSE_IF(file_w_ptr_ == nullptr);
     RETURN_FALSE_IF(data_ptr == nullptr);
@@ -77,9 +73,7 @@ bool BinaryDataLog::RecordImage(const uint16_t package_id,
     return true;
 }
 
-bool BinaryDataLog::RecordPackage(const uint16_t package_id, const Mat &matrix) {
-    return RecordPackage(package_id, matrix, GetSystemTimestamp());
-}
+bool BinaryDataLog::RecordPackage(const uint16_t package_id, const Mat &matrix) { return RecordPackage(package_id, matrix, GetSystemTimestamp()); }
 
 bool BinaryDataLog::RecordPackage(const uint16_t package_id, const Mat &matrix, const float time_stamp_s) {
     RETURN_FALSE_IF(file_w_ptr_ == nullptr);
@@ -174,9 +168,7 @@ bool BinaryDataLog::RecordPackage(const uint16_t package_id, const std::vector<u
     return true;
 }
 
-bool BinaryDataLog::RecordPackage(const uint16_t package_id, const std::vector<Vec3> &points_cloud) {
-    return RecordPackage(package_id, points_cloud, 1);
-}
+bool BinaryDataLog::RecordPackage(const uint16_t package_id, const std::vector<Vec3> &points_cloud) { return RecordPackage(package_id, points_cloud, 1); }
 
 bool BinaryDataLog::RecordPackage(const uint16_t package_id, const std::vector<Vec3> &points_cloud, const float time_stamp_s) {
     return RecordPackage(package_id, points_cloud, 1, time_stamp_s);
@@ -233,4 +225,4 @@ bool BinaryDataLog::RecordPackage(const uint16_t package_id, const std::vector<V
     return true;
 }
 
-}
+}  // namespace SLAM_DATA_LOG

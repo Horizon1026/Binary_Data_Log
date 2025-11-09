@@ -1,6 +1,6 @@
 #include "binary_data_log.h"
-#include "slam_operations.h"
 #include "slam_log_reporter.h"
+#include "slam_operations.h"
 
 namespace SLAM_DATA_LOG {
 
@@ -32,13 +32,9 @@ void BinaryDataLog::CleanUp() {
     packages_id_with_data_.clear();
 }
 
-bool BinaryDataLog::IsDynamicType(uint8_t type_code) {
-    return type_code > static_cast<uint8_t>(ItemType::kPose6Dof);
-}
+bool BinaryDataLog::IsDynamicType(uint8_t type_code) { return type_code > static_cast<uint8_t>(ItemType::kPose6Dof); }
 
-bool BinaryDataLog::IsDynamicType(ItemType type) {
-    return type > ItemType::kPose6Dof;
-}
+bool BinaryDataLog::IsDynamicType(ItemType type) { return type > ItemType::kPose6Dof; }
 
 bool BinaryDataLog::CreateLogFile(const std::string &log_file_name) {
     // If last log file is not closed, close it.
@@ -107,9 +103,7 @@ bool BinaryDataLog::PrepareForRecording() {
     return true;
 }
 
-void BinaryDataLog::WriteLogFileHeader() {
-    file_w_ptr_->write(binary_log_file_header.c_str(), binary_log_file_header.size());
-}
+void BinaryDataLog::WriteLogFileHeader() { file_w_ptr_->write(binary_log_file_header.c_str(), binary_log_file_header.size()); }
 
 uint8_t BinaryDataLog::SummaryBytes(const uint8_t *byte_ptr, const uint32_t size, const uint8_t init_value) {
     uint8_t value = init_value;
@@ -138,15 +132,14 @@ void BinaryDataLog::ReportAllRegisteredPackages() {
         ReportInfo("   Package id : " << package->id);
         ReportInfo("   Package items : [type | data_index_in_package_data | name]");
         for (const auto &item: package->items) {
-            ReportInfo("      " << item_type_strings[static_cast<uint32_t>(item.type)] << " | " <<
-                item.bindata_index_in_package << " | " << item.name);
+            ReportInfo("      " << item_type_strings[static_cast<uint32_t>(item.type)] << " | " << item.bindata_index_in_package << " | " << item.name);
         }
     }
 }
 
 void BinaryDataLog::ReportAllLoadedPackages() {
-    ReportColorInfo("[DataLog] Report all loaded packages binary data between " << timestamp_s_range_of_loaded_log_.first <<
-        "s to " << timestamp_s_range_of_loaded_log_.second << "s:");
+    ReportColorInfo("[DataLog] Report all loaded packages binary data between " << timestamp_s_range_of_loaded_log_.first << "s to "
+                                                                                << timestamp_s_range_of_loaded_log_.second << "s:");
     for (const auto &package: packages_id_with_data_) {
         const auto it = packages_id_with_objects_.find(package.first);
         if (it == packages_id_with_objects_.end()) {
@@ -196,7 +189,8 @@ void BinaryDataLog::ReportAllLoadedPackages() {
                     break;
                 }
 
-                default: break;
+                default:
+                    break;
             }
 
             // Print loaded bytes of this item.
@@ -216,4 +210,4 @@ void BinaryDataLog::ReportAllLoadedPackages() {
     }
 }
 
-}
+}  // namespace SLAM_DATA_LOG

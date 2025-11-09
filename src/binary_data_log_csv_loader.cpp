@@ -132,7 +132,8 @@ bool BinaryDataLog::CreateLogFileByCsvFile(const std::string &csv_file_name, con
         ReportError("[DataLog] Timestamp index not found in csv file: " + csv_file_name);
         return false;
     }
-    ReportInfo("[DataLog] Time stamp index found in csv file: " << time_stamp_index << " [name][" << csv_header_items[time_stamp_index] << "] [scale][" << time_stamp_scale << "]");
+    ReportInfo("[DataLog] Time stamp index found in csv file: " << time_stamp_index << " [name][" << csv_header_items[time_stamp_index] << "] [scale]["
+                                                                << time_stamp_scale << "]");
 
     // Parse csv header items into csv_header_items_map.
     for (uint32_t i = 0; i < csv_header_items.size(); i++) {
@@ -166,8 +167,8 @@ bool BinaryDataLog::CreateLogFileByCsvFile(const std::string &csv_file_name, con
         package_ptr->name = package.first;
         for (int32_t i = 0; i < static_cast<int32_t>(items.size()); i++) {
             if (i < static_cast<int32_t>(items.size()) - 6) {
-                if (items[i].first.back() == 'x' && items[i + 1].first.back() == 'y' && items[i + 2].first.back() == 'z' &&
-                    items[i + 3].first.back() == 'w' && items[i + 4].first.back() == 'x' && items[i + 5].first.back() == 'y' && items[i + 6].first.back() == 'z') {
+                if (items[i].first.back() == 'x' && items[i + 1].first.back() == 'y' && items[i + 2].first.back() == 'z' && items[i + 3].first.back() == 'w' &&
+                    items[i + 4].first.back() == 'x' && items[i + 5].first.back() == 'y' && items[i + 6].first.back() == 'z') {
                     CONTINUE_IF(items[i].first.front() != 'p' || items[i + 3].first.front() != 'q');
                     std::string quat_item_name = items[i].first;
                     if (quat_item_name.size() <= 2) {
@@ -179,7 +180,7 @@ bool BinaryDataLog::CreateLogFileByCsvFile(const std::string &csv_file_name, con
                         quat_item_name = quat_item_name.substr(0, quat_item_name.size() - 1);
                         quat_item_name[0] = 'T';
                     }
-                    package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kPose6Dof, .name = quat_item_name});
+                    package_ptr->items.emplace_back(PackageItemInfo {.type = ItemType::kPose6Dof, .name = quat_item_name});
                     i += 6;
                     continue;
                 }
@@ -194,12 +195,12 @@ bool BinaryDataLog::CreateLogFileByCsvFile(const std::string &csv_file_name, con
                     } else {
                         vector3_item_name = vector3_item_name.substr(0, vector3_item_name.size() - 1);
                     }
-                    package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kVector3, .name = vector3_item_name});
+                    package_ptr->items.emplace_back(PackageItemInfo {.type = ItemType::kVector3, .name = vector3_item_name});
                     i += 2;
                     continue;
                 }
             }
-            package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kFloat, .name = items[i].first});
+            package_ptr->items.emplace_back(PackageItemInfo {.type = ItemType::kFloat, .name = items[i].first});
         }
         if (!log_recorder.RegisterPackage(package_ptr)) {
             ReportError("[DataLog] Failed to register package: " + package.first);
@@ -244,4 +245,4 @@ bool BinaryDataLog::CreateLogFileByCsvFile(const std::string &csv_file_name, con
     return true;
 }
 
-} // namespace SLAM_DATA_LOG
+}  // namespace SLAM_DATA_LOG

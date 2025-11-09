@@ -23,6 +23,6 @@ struct BinaryLog6DofPose {
 
 #pragma pack()
 
-}
+}  // namespace SLAM_DATA_LOG
 
-#endif // end of _BINARY_DATA_LOG_BASIC_TYPE_H_
+#endif  // end of _BINARY_DATA_LOG_BASIC_TYPE_H_

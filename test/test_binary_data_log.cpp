@@ -1,13 +1,13 @@
 #include "binary_data_log.h"
-#include "visualizor_2d.h"
-#include "slam_operations.h"
 #include "slam_log_reporter.h"
+#include "slam_operations.h"
+#include "visualizor_2d.h"
 
-#include "unistd.h"
-#include "iostream"
-#include "dirent.h"
-#include "vector"
 #include "cstring"
+#include "dirent.h"
+#include "iostream"
+#include "unistd.h"
+#include "vector"
 
 using namespace SLAM_DATA_LOG;
 using namespace SLAM_VISUALIZOR;
@@ -76,9 +76,9 @@ void RegisterAllPackages(BinaryDataLog &logger) {
         std::unique_ptr<PackageInfo> package_ptr = std::make_unique<PackageInfo>();
         package_ptr->id = 1;
         package_ptr->name = "imu";
-        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kVector3, .name = "gyro"});
-        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kVector3, .name = "accel"});
-        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kUint8, .name = "valid"});
+        package_ptr->items.emplace_back(PackageItemInfo {.type = ItemType::kVector3, .name = "gyro"});
+        package_ptr->items.emplace_back(PackageItemInfo {.type = ItemType::kVector3, .name = "accel"});
+        package_ptr->items.emplace_back(PackageItemInfo {.type = ItemType::kUint8, .name = "valid"});
 
         if (logger.RegisterPackage(package_ptr)) {
             ReportInfo("Register a new package.");
@@ -90,9 +90,9 @@ void RegisterAllPackages(BinaryDataLog &logger) {
         std::unique_ptr<PackageInfo> package_ptr = std::make_unique<PackageInfo>();
         package_ptr->id = 2;
         package_ptr->name = "baro";
-        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kUint32, .name = "press"});
-        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kFloat, .name = "height"});
-        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kUint8, .name = "valid"});
+        package_ptr->items.emplace_back(PackageItemInfo {.type = ItemType::kUint32, .name = "press"});
+        package_ptr->items.emplace_back(PackageItemInfo {.type = ItemType::kFloat, .name = "height"});
+        package_ptr->items.emplace_back(PackageItemInfo {.type = ItemType::kUint8, .name = "valid"});
 
         if (logger.RegisterPackage(package_ptr)) {
             ReportInfo("Register a new package.");
@@ -104,7 +104,7 @@ void RegisterAllPackages(BinaryDataLog &logger) {
         std::unique_ptr<PackageInfo> package_ptr = std::make_unique<PackageInfo>();
         package_ptr->id = 3;
         package_ptr->name = "gray image";
-        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kImage, .name = "left"});
+        package_ptr->items.emplace_back(PackageItemInfo {.type = ItemType::kImage, .name = "left"});
 
         if (logger.RegisterPackage(package_ptr)) {
             ReportInfo("Register a new package.");
@@ -116,7 +116,7 @@ void RegisterAllPackages(BinaryDataLog &logger) {
         std::unique_ptr<PackageInfo> package_ptr = std::make_unique<PackageInfo>();
         package_ptr->id = 4;
         package_ptr->name = "rgb image";
-        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kImage, .name = "left"});
+        package_ptr->items.emplace_back(PackageItemInfo {.type = ItemType::kImage, .name = "left"});
 
         if (logger.RegisterPackage(package_ptr)) {
             ReportInfo("Register a new package.");
@@ -128,7 +128,7 @@ void RegisterAllPackages(BinaryDataLog &logger) {
         std::unique_ptr<PackageInfo> package_ptr = std::make_unique<PackageInfo>();
         package_ptr->id = 5;
         package_ptr->name = "matrix";
-        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kMatrix, .name = "matrix"});
+        package_ptr->items.emplace_back(PackageItemInfo {.type = ItemType::kMatrix, .name = "matrix"});
 
         if (logger.RegisterPackage(package_ptr)) {
             ReportInfo("Register a new package.");
@@ -140,7 +140,7 @@ void RegisterAllPackages(BinaryDataLog &logger) {
         std::unique_ptr<PackageInfo> package_ptr = std::make_unique<PackageInfo>();
         package_ptr->id = 6;
         package_ptr->name = "png image";
-        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kPngImage, .name = "left(png)"});
+        package_ptr->items.emplace_back(PackageItemInfo {.type = ItemType::kPngImage, .name = "left(png)"});
 
         if (logger.RegisterPackage(package_ptr)) {
             ReportInfo("Register a new package.");
@@ -152,10 +152,10 @@ void RegisterAllPackages(BinaryDataLog &logger) {
         std::unique_ptr<PackageInfo> package_ptr = std::make_unique<PackageInfo>();
         package_ptr->id = 7;
         package_ptr->name = "slam state";
-        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kUint8, .name = "is_vel_valid"});
-        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kVector3, .name = "velocity"});
-        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kUint8, .name = "is_pose_valid"});
-        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kPose6Dof, .name = "pose"});
+        package_ptr->items.emplace_back(PackageItemInfo {.type = ItemType::kUint8, .name = "is_vel_valid"});
+        package_ptr->items.emplace_back(PackageItemInfo {.type = ItemType::kVector3, .name = "velocity"});
+        package_ptr->items.emplace_back(PackageItemInfo {.type = ItemType::kUint8, .name = "is_pose_valid"});
+        package_ptr->items.emplace_back(PackageItemInfo {.type = ItemType::kPose6Dof, .name = "pose"});
 
         if (logger.RegisterPackage(package_ptr)) {
             ReportInfo("Register a new package.");
@@ -167,7 +167,7 @@ void RegisterAllPackages(BinaryDataLog &logger) {
         std::unique_ptr<PackageInfo> package_ptr = std::make_unique<PackageInfo>();
         package_ptr->id = 8;
         package_ptr->name = "local map";
-        package_ptr->items.emplace_back(PackageItemInfo{.type = ItemType::kPointCloud, .name = "point cloud"});
+        package_ptr->items.emplace_back(PackageItemInfo {.type = ItemType::kPointCloud, .name = "point cloud"});
 
         if (logger.RegisterPackage(package_ptr)) {
             ReportInfo("Register a new package.");
@@ -212,7 +212,7 @@ void TestCreateLog(const std::string &log_file_name) {
         const float timestamp = static_cast<float>(i) * 0.2f;
         const float temp = static_cast<float>(i) / 15.0f;
         ImuData imu_data {
-            .gyro_x = - std::sin(temp + 0.34f),
+            .gyro_x = -std::sin(temp + 0.34f),
             .gyro_y = std::sin(1.05f * temp + 1.5f),
             .gyro_z = std::sin(1.1f * temp + 1.0f),
             .accel_x = std::sin(1.15f * temp),
@@ -245,7 +245,8 @@ void TestCreateLog(const std::string &log_file_name) {
         };
         logger.RecordPackage(7, reinterpret_cast<const char *>(&state_data), timestamp);
 
-        if (i % (200 / max_idx_of_image_file) == 0 && idx_of_image_file < max_idx_of_image_file && image_filenames[idx_of_image_file].find(".png") != std::string::npos) {
+        if (i % (200 / max_idx_of_image_file) == 0 && idx_of_image_file < max_idx_of_image_file &&
+            image_filenames[idx_of_image_file].find(".png") != std::string::npos) {
             // Record image.
             GrayImage gray_image;
             Visualizor2D::LoadImage(image_filenames[idx_of_image_file], gray_image);
@@ -273,11 +274,7 @@ void TestCreateLog(const std::string &log_file_name) {
             std::vector<Vec3> points;
             for (uint32_t j = 0; j < 40; ++j) {
                 const float temp_j = static_cast<float>(j) / 10.0f;
-                points.emplace_back(Vec3(
-                    std::sin(temp_j + 0.15f * i),
-                    std::cos(temp_j + 0.1f * i + 0.2f),
-                    std::sin(temp_j + 0.3f * i)
-                ));
+                points.emplace_back(Vec3(std::sin(temp_j + 0.15f * i), std::cos(temp_j + 0.1f * i + 0.2f), std::sin(temp_j + 0.3f * i)));
             }
             logger.RecordPackage(8, points, timestamp);
         }

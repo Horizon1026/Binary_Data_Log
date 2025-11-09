@@ -1,6 +1,6 @@
 #include "binary_data_log.h"
-#include "slam_operations.h"
 #include "slam_log_reporter.h"
+#include "slam_operations.h"
 
 #include "chrono"
 
@@ -17,18 +17,18 @@ bool BinaryDataLog::RecordAllRegisteredPackagesAsFileHead() {
     for (const auto &pair: packages_id_with_objects_) {
         const auto &package = pair.second;
 
-        uint32_t offset_to_next_package = 4;    // Offset itself.
-        offset_to_next_package += 2;    // Package id.
-        offset_to_next_package += 1;    // Length of package name string.
+        uint32_t offset_to_next_package = 4;  // Offset itself.
+        offset_to_next_package += 2;          // Package id.
+        offset_to_next_package += 1;          // Length of package name string.
         offset_to_next_package += package->name.size();
 
         for (const auto &item: package->items) {
-            offset_to_next_package += 1;    // Type of item.
-            offset_to_next_package += 1;    // Length of item name string.
+            offset_to_next_package += 1;  // Type of item.
+            offset_to_next_package += 1;  // Length of item name string.
             offset_to_next_package += item.name.size();
         }
 
-        offset_to_next_package += 1;    // Sum check of package.
+        offset_to_next_package += 1;  // Sum check of package.
 
         // The size/offset of this package is confirmed.
         offsets.emplace_back(offset_to_next_package);
@@ -85,14 +85,9 @@ float BinaryDataLog::GetSystemTimestamp() {
     return static_cast<float>(elapsed_seconds.count());
 }
 
-bool BinaryDataLog::RecordPackage(const uint16_t package_id,
-                                  const char *data_ptr) {
-    return RecordPackage(package_id, data_ptr, GetSystemTimestamp());
-}
+bool BinaryDataLog::RecordPackage(const uint16_t package_id, const char *data_ptr) { return RecordPackage(package_id, data_ptr, GetSystemTimestamp()); }
 
-bool BinaryDataLog::RecordPackage(const uint16_t package_id,
-                                  const char *data_ptr,
-                                  const float time_stamp_s) {
+bool BinaryDataLog::RecordPackage(const uint16_t package_id, const char *data_ptr, const float time_stamp_s) {
     RETURN_FALSE_IF(file_w_ptr_ == nullptr);
     RETURN_FALSE_IF(data_ptr == nullptr);
 
@@ -127,4 +122,4 @@ bool BinaryDataLog::RecordPackage(const uint16_t package_id,
     return true;
 }
 
-}
+}  // namespace SLAM_DATA_LOG

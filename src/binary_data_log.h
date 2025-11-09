@@ -1,18 +1,18 @@
 #ifndef _BINARY_DATA_LOG_H_
 #define _BINARY_DATA_LOG_H_
 
-#include "binary_data_log_file_protocal.h"
 #include "binary_data_log_basic_type.h"
+#include "binary_data_log_file_protocal.h"
 #include "datatype_image.h"
 
-#include "iostream"
-#include "fstream"
 #include "chrono"
+#include "fstream"
+#include "iostream"
 #include "memory"
 
 #include "string"
-#include "vector"
 #include "unordered_map"
+#include "vector"
 
 namespace SLAM_DATA_LOG {
 
@@ -48,8 +48,10 @@ public:
 
     // Support for decoder.
     bool LoadLogFile(const std::string &log_file_name, bool load_dynamic_package_full_data = false);
-    template <typename T> static T ConvertBytes(const uint8_t *bytes, ItemType type);
-    template <typename T> static T ConvertBytes(const uint8_t *bytes, ItemType type, DecodeType decoder);
+    template <typename T>
+    static T ConvertBytes(const uint8_t *bytes, ItemType type);
+    template <typename T>
+    static T ConvertBytes(const uint8_t *bytes, ItemType type, DecodeType decoder);
     uint8_t *LoadBinaryDataFromLogFile(uint64_t index_in_file, uint32_t size);
 
     // Support for csv loader.
@@ -76,35 +78,23 @@ public:
 
 private:
     // Support for decodec.
-    uint8_t SummaryBytes(const uint8_t *byte_ptr,
-                         const uint32_t size,
-                         const uint8_t init_value);
+    uint8_t SummaryBytes(const uint8_t *byte_ptr, const uint32_t size, const uint8_t init_value);
     std::string LoadStringFromBinaryFile(uint32_t size);
 
     // Support for recorder.
     void WriteLogFileHeader();
     bool RecordAllRegisteredPackagesAsFileHead();
     float GetSystemTimestamp();
-    bool RecordImage(const uint16_t package_id,
-                     const int32_t channels,
-                     const int32_t image_rows,
-                     const int32_t image_cols,
-                     const uint8_t *data_ptr,
+    bool RecordImage(const uint16_t package_id, const int32_t channels, const int32_t image_rows, const int32_t image_cols, const uint8_t *data_ptr,
                      const float time_stamp_s);
 
     // Support for decoder.
     bool CheckLogFileHeader();
     bool LoadRegisteredPackagesFromFileHead();
     bool LoadOnePackage(bool load_full_data = true);
-    bool LoadOnePackageWithStaticSize(uint8_t &sum_check_byte,
-                                      PackageDataPerTick &timestamped_data,
-                                      uint16_t package_id,
-                                      uint32_t data_size,
+    bool LoadOnePackageWithStaticSize(uint8_t &sum_check_byte, PackageDataPerTick &timestamped_data, uint16_t package_id, uint32_t data_size,
                                       bool load_full_data);
-    bool LoadOnePackageWithDynamicSize(PackageInfo &package_info,
-                                       uint8_t &sum_check_byte,
-                                       PackageDataPerTick &timestamped_data,
-                                       uint16_t package_id,
+    bool LoadOnePackageWithDynamicSize(PackageInfo &package_info, uint8_t &sum_check_byte, PackageDataPerTick &timestamped_data, uint16_t package_id,
                                        bool load_full_data);
 
 private:
@@ -200,11 +190,12 @@ T BinaryDataLog::ConvertBytes(const uint8_t *bytes, ItemType type, DecodeType de
             break;
         }
 
-        default: break;
+        default:
+            break;
     }
     return static_cast<T>(value);
 }
 
-}
+}  // namespace SLAM_DATA_LOG
 
-#endif // end of _BINARY_DATA_LOG_H_
+#endif  // end of _BINARY_DATA_LOG_H_

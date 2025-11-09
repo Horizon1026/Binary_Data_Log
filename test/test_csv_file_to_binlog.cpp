@@ -1,13 +1,13 @@
 #include "binary_data_log.h"
-#include "visualizor_2d.h"
-#include "slam_operations.h"
-#include "slam_log_reporter.h"
-#include "filesystem"
-#include "unistd.h"
-#include "iostream"
-#include "dirent.h"
-#include "vector"
 #include "cstring"
+#include "dirent.h"
+#include "filesystem"
+#include "iostream"
+#include "slam_log_reporter.h"
+#include "slam_operations.h"
+#include "unistd.h"
+#include "vector"
+#include "visualizor_2d.h"
 
 using namespace SLAM_DATA_LOG;
 using namespace SLAM_VISUALIZOR;

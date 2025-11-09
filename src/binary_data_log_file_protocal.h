@@ -111,41 +111,27 @@ enum class ItemType : uint8_t {
 };
 
 static std::vector<uint32_t> item_type_sizes = {
-    1,  // kUint8.
-    1,  // kInt8.
-    2,  // kUint16.
-    2,  // kInt16.
-    4,  // kUint32.
-    4,  // kInt32.
-    8,  // kUint64.
-    8,  // kInt64.
-    4,  // kFloat.
-    8,  // kDouble.
-    12, // kVector3.
-    28, // kPose6Dof.
-    0,  // kImage.
-    0,  // kPngImage.
-    0,  // kMatrix.
-    0,  // kPointCloud.
+    1,   // kUint8.
+    1,   // kInt8.
+    2,   // kUint16.
+    2,   // kInt16.
+    4,   // kUint32.
+    4,   // kInt32.
+    8,   // kUint64.
+    8,   // kInt64.
+    4,   // kFloat.
+    8,   // kDouble.
+    12,  // kVector3.
+    28,  // kPose6Dof.
+    0,   // kImage.
+    0,   // kPngImage.
+    0,   // kMatrix.
+    0,   // kPointCloud.
 };
 
 static std::vector<std::string> item_type_strings = {
-    "kUint8",
-    "kInt8",
-    "kUint16",
-    "kInt16",
-    "kUint32",
-    "kInt32",
-    "kUint64",
-    "kInt64",
-    "kFloat",
-    "kDouble",
-    "kVector3",
-    "kPose6Dof",
-    "kImage",
-    "kPngImage",
-    "kMatrix",
-    "kPointCloud",
+    "kUint8", "kInt8",   "kUint16",  "kInt16",    "kUint32", "kInt32",    "kUint64", "kInt64",
+    "kFloat", "kDouble", "kVector3", "kPose6Dof", "kImage",  "kPngImage", "kMatrix", "kPointCloud",
 };
 
 enum class DecodeType : uint8_t {
@@ -176,11 +162,11 @@ struct PackageInfo {
 
 struct PackageDataPerTick {
     float timestamp_s = 0.0f;
-    std::vector<uint8_t> data;  // Binary data stored in bytes.
-    uint64_t index_in_file = 0; // Start at 'offset'.
+    std::vector<uint8_t> data;         // Binary data stored in bytes.
+    uint64_t index_in_file = 0;        // Start at 'offset'.
     uint32_t size_of_all_in_file = 0;  // Including offset, id, timestamp, binary_data, check_byte.
 };
 
-}
+}  // namespace SLAM_DATA_LOG
 
-#endif // end of _BINARY_DATA_LOG_FILE_PROTOCAL_H_
+#endif  // end of _BINARY_DATA_LOG_FILE_PROTOCAL_H_

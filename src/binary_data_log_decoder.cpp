@@ -1,7 +1,7 @@
 #include "binary_data_log.h"
-#include "slam_operations.h"
 #include "slam_log_reporter.h"
 #include "slam_memory.h"
+#include "slam_operations.h"
 
 namespace SLAM_DATA_LOG {
 
@@ -133,9 +133,8 @@ bool BinaryDataLog::LoadRegisteredPackagesFromFileHead() {
         uint8_t loaded_sum_check_byte = 0;
         file_r_ptr_->read(reinterpret_cast<char *>(&loaded_sum_check_byte), 1);
         if (sum_check_byte != loaded_sum_check_byte) {
-            ReportWarn("[DataLog] Package summary check byte failed. Compute " <<
-                static_cast<int32_t>(sum_check_byte) << " != " <<
-                static_cast<int32_t>(loaded_sum_check_byte));
+            ReportWarn("[DataLog] Package summary check byte failed. Compute " << static_cast<int32_t>(sum_check_byte)
+                                                                               << " != " << static_cast<int32_t>(loaded_sum_check_byte));
             return false;
         }
 
@@ -192,8 +191,8 @@ bool BinaryDataLog::LoadOnePackage(bool load_dynamic_package_full_data) {
         load_result = LoadOnePackageWithStaticSize(sum_check_byte, timestamped_data, package_id, data_size, true);
     }
     if (!load_result) {
-        ReportWarn("[DataLog] Load one package data failed for checking byte. Index in file : " <<
-            timestamped_data.index_in_file << ". Data size [" << data_size << "]. Skip to load next package.");
+        ReportWarn("[DataLog] Load one package data failed for checking byte. Index in file : " << timestamped_data.index_in_file << ". Data size ["
+                                                                                                << data_size << "]. Skip to load next package.");
     }
 
     // Locate to the position of next package.
@@ -203,10 +202,7 @@ bool BinaryDataLog::LoadOnePackage(bool load_dynamic_package_full_data) {
     return load_result;
 }
 
-bool BinaryDataLog::LoadOnePackageWithStaticSize(uint8_t &sum_check_byte,
-                                                 PackageDataPerTick &timestamped_data,
-                                                 uint16_t package_id,
-                                                 uint32_t data_size,
+bool BinaryDataLog::LoadOnePackageWithStaticSize(uint8_t &sum_check_byte, PackageDataPerTick &timestamped_data, uint16_t package_id, uint32_t data_size,
                                                  bool load_full_data) {
     char *buffer = new char[data_size];
     file_r_ptr_->read(buffer, data_size);
@@ -224,8 +220,8 @@ bool BinaryDataLog::LoadOnePackageWithStaticSize(uint8_t &sum_check_byte,
     // Store this data package and check timestamp.
     auto &packages = packages_id_with_data_[package_id];
     if (!packages.empty() && timestamped_data.timestamp_s == packages.back().timestamp_s) {
-        ReportWarn("[DataLog] Same timestamp " << timestamped_data.timestamp_s << "s of package [id][" <<
-            package_id << "] is detected when decoding static size data package.");
+        ReportWarn("[DataLog] Same timestamp " << timestamped_data.timestamp_s << "s of package [id][" << package_id
+                                               << "] is detected when decoding static size data package.");
     }
     packages.emplace_back(timestamped_data);
 
@@ -240,10 +236,7 @@ bool BinaryDataLog::LoadOnePackageWithStaticSize(uint8_t &sum_check_byte,
     return true;
 }
 
-bool BinaryDataLog::LoadOnePackageWithDynamicSize(PackageInfo &package_info,
-                                                  uint8_t &sum_check_byte,
-                                                  PackageDataPerTick &timestamped_data,
-                                                  uint16_t package_id,
+bool BinaryDataLog::LoadOnePackageWithDynamicSize(PackageInfo &package_info, uint8_t &sum_check_byte, PackageDataPerTick &timestamped_data, uint16_t package_id,
                                                   bool load_full_data) {
     RETURN_FALSE_IF(package_info.items.empty());
 
@@ -312,8 +305,8 @@ bool BinaryDataLog::LoadOnePackageWithDynamicSize(PackageInfo &package_info,
     // Store this data package and check timestamp.
     auto &packages = packages_id_with_data_[package_id];
     if (!packages.empty() && timestamped_data.timestamp_s == packages.back().timestamp_s) {
-        ReportWarn("[DataLog] Same timestamp " << timestamped_data.timestamp_s << "s of package [id][" <<
-            package_id << "] is detected when decoding dynamic size data package.");
+        ReportWarn("[DataLog] Same timestamp " << timestamped_data.timestamp_s << "s of package [id][" << package_id
+                                               << "] is detected when decoding dynamic size data package.");
     }
     packages.emplace_back(timestamped_data);
 
@@ -329,4 +322,4 @@ bool BinaryDataLog::LoadOnePackageWithDynamicSize(PackageInfo &package_info,
     return true;
 }
 
-}
+}  // namespace SLAM_DATA_LOG
