@@ -3,7 +3,7 @@
 #include "slam_memory.h"
 #include "slam_operations.h"
 
-namespace SLAM_DATA_LOG {
+namespace slam_data_log {
 
 uint8_t *BinaryDataLog::LoadBinaryDataFromLogFile(uint64_t index_in_file, uint32_t size) {
     if (file_r_ptr_ == nullptr) {
@@ -322,4 +322,4 @@ bool BinaryDataLog::LoadOnePackageWithDynamicSize(PackageInfo &package_info, uin
     return true;
 }
 
-}  // namespace SLAM_DATA_LOG
+}  // namespace slam_data_log

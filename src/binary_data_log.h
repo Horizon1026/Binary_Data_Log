@@ -14,7 +14,7 @@
 #include "unordered_map"
 #include "vector"
 
-namespace SLAM_DATA_LOG {
+namespace slam_data_log {
 
 /* Class BinaryDataLog Declaration. */
 class BinaryDataLog {
@@ -120,31 +120,31 @@ T BinaryDataLog::ConvertBytes(const uint8_t *bytes, ItemType type) {
             return static_cast<T>(*bytes);
         }
         case ItemType::kInt8: {
-            const SLAM_UTILITY::int8_t *data_ptr = reinterpret_cast<const SLAM_UTILITY::int8_t *>(bytes);
+            const slam_utility::int8_t *data_ptr = reinterpret_cast<const slam_utility::int8_t *>(bytes);
             return static_cast<T>(*data_ptr);
         }
         case ItemType::kUint16: {
-            const SLAM_UTILITY::uint16_t *data_ptr = reinterpret_cast<const SLAM_UTILITY::uint16_t *>(bytes);
+            const slam_utility::uint16_t *data_ptr = reinterpret_cast<const slam_utility::uint16_t *>(bytes);
             return static_cast<T>(*data_ptr);
         }
         case ItemType::kInt16: {
-            const SLAM_UTILITY::int16_t *data_ptr = reinterpret_cast<const SLAM_UTILITY::int16_t *>(bytes);
+            const slam_utility::int16_t *data_ptr = reinterpret_cast<const slam_utility::int16_t *>(bytes);
             return static_cast<T>(*data_ptr);
         }
         case ItemType::kUint32: {
-            const SLAM_UTILITY::uint32_t *data_ptr = reinterpret_cast<const SLAM_UTILITY::uint32_t *>(bytes);
+            const slam_utility::uint32_t *data_ptr = reinterpret_cast<const slam_utility::uint32_t *>(bytes);
             return static_cast<T>(*data_ptr);
         }
         case ItemType::kInt32: {
-            const SLAM_UTILITY::int32_t *data_ptr = reinterpret_cast<const SLAM_UTILITY::int32_t *>(bytes);
+            const slam_utility::int32_t *data_ptr = reinterpret_cast<const slam_utility::int32_t *>(bytes);
             return static_cast<T>(*data_ptr);
         }
         case ItemType::kUint64: {
-            const SLAM_UTILITY::uint64_t *data_ptr = reinterpret_cast<const SLAM_UTILITY::uint64_t *>(bytes);
+            const slam_utility::uint64_t *data_ptr = reinterpret_cast<const slam_utility::uint64_t *>(bytes);
             return static_cast<T>(*data_ptr);
         }
         case ItemType::kInt64: {
-            const SLAM_UTILITY::int64_t *data_ptr = reinterpret_cast<const SLAM_UTILITY::int64_t *>(bytes);
+            const slam_utility::int64_t *data_ptr = reinterpret_cast<const slam_utility::int64_t *>(bytes);
             return static_cast<T>(*data_ptr);
         }
         case ItemType::kFloat: {
@@ -196,6 +196,6 @@ T BinaryDataLog::ConvertBytes(const uint8_t *bytes, ItemType type, DecodeType de
     return static_cast<T>(value);
 }
 
-}  // namespace SLAM_DATA_LOG
+}  // namespace slam_data_log
 
 #endif  // end of _BINARY_DATA_LOG_H_

@@ -9,7 +9,7 @@
 #include "unistd.h"
 #include "vector"
 
-namespace SLAM_DATA_LOG {
+namespace slam_data_log {
 
 bool BinaryDataLog::CreateLogFileByCsvFile(const std::string &csv_file_name, const std::string &log_file_name) {
     RETURN_FALSE_IF(csv_file_name.empty());
@@ -245,4 +245,4 @@ bool BinaryDataLog::CreateLogFileByCsvFile(const std::string &csv_file_name, con
     return true;
 }
 
-}  // namespace SLAM_DATA_LOG
+}  // namespace slam_data_log

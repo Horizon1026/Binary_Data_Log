@@ -4,7 +4,7 @@
 
 #include "chrono"
 
-namespace SLAM_DATA_LOG {
+namespace slam_data_log {
 
 bool BinaryDataLog::RecordPackage(const uint16_t package_id, const GrayImage &image, const float time_stamp_s) {
     return RecordImage(package_id, 1, image.rows(), image.cols(), image.data(), time_stamp_s);
@@ -225,4 +225,4 @@ bool BinaryDataLog::RecordPackage(const uint16_t package_id, const std::vector<V
     return true;
 }
 
-}  // namespace SLAM_DATA_LOG
+}  // namespace slam_data_log

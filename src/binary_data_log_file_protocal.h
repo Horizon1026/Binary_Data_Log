@@ -87,9 +87,9 @@ for each point cloud package:
 
 */
 
-using namespace SLAM_UTILITY;
+using namespace slam_utility;
 
-namespace SLAM_DATA_LOG {
+namespace slam_data_log {
 
 enum class ItemType : uint8_t {
     kUint8 = 0,
@@ -167,6 +167,6 @@ struct PackageDataPerTick {
     uint32_t size_of_all_in_file = 0;  // Including offset, id, timestamp, binary_data, check_byte.
 };
 
-}  // namespace SLAM_DATA_LOG
+}  // namespace slam_data_log
 
 #endif  // end of _BINARY_DATA_LOG_FILE_PROTOCAL_H_

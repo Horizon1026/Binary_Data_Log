@@ -9,8 +9,8 @@
 #include "vector"
 #include "visualizor_2d.h"
 
-using namespace SLAM_DATA_LOG;
-using namespace SLAM_VISUALIZOR;
+using namespace slam_data_log;
+using namespace slam_visualizor;
 
 #include "enable_stack_backward.h"
 

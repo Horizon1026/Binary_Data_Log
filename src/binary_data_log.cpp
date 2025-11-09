@@ -2,7 +2,7 @@
 #include "slam_log_reporter.h"
 #include "slam_operations.h"
 
-namespace SLAM_DATA_LOG {
+namespace slam_data_log {
 
 namespace {
     constexpr uint32_t kMaxPrintBytesForEachItem = 10;
@@ -210,4 +210,4 @@ void BinaryDataLog::ReportAllLoadedPackages() {
     }
 }
 
-}  // namespace SLAM_DATA_LOG
+}  // namespace slam_data_log

@@ -4,7 +4,7 @@
 
 #include "chrono"
 
-namespace SLAM_DATA_LOG {
+namespace slam_data_log {
 
 bool BinaryDataLog::RecordAllRegisteredPackagesAsFileHead() {
     if (packages_id_with_objects_.empty()) {
@@ -122,4 +122,4 @@ bool BinaryDataLog::RecordPackage(const uint16_t package_id, const char *data_pt
     return true;
 }
 
-}  // namespace SLAM_DATA_LOG
+}  // namespace slam_data_log

@@ -1,7 +1,7 @@
 #ifndef _BINARY_DATA_LOG_BASIC_TYPE_H_
 #define _BINARY_DATA_LOG_BASIC_TYPE_H_
 
-namespace SLAM_DATA_LOG {
+namespace slam_data_log {
 
 #pragma pack(1)
 
@@ -23,6 +23,6 @@ struct BinaryLog6DofPose {
 
 #pragma pack()
 
-}  // namespace SLAM_DATA_LOG
+}  // namespace slam_data_log
 
 #endif  // end of _BINARY_DATA_LOG_BASIC_TYPE_H_
