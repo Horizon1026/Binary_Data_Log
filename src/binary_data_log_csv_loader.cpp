@@ -11,6 +11,29 @@
 
 namespace slam_data_log {
 
+namespace {
+    std::vector<std::string> kTimeStampSuffixList = {"_s", "_ns", "_us", "_ms", "[s]", "[ns]", "[us]", "[ms]"};
+    std::vector<double> kTimeStampScaleList = {1.0, 1e-9, 1e-6, 1e-3, 1.0, 1e-9, 1e-6, 1e-3};
+}
+
+bool BinaryDataLog::ParseTimestampInCsvHeader(const std::string &csv_header_name, double &timestamp_scale) {
+    if (csv_header_name == "timestamp" || csv_header_name == "time_stamp") {
+        timestamp_scale = 1e-6;
+        return true;
+    }
+
+    using namespace slam_utility;
+    if (SlamOperation::IsContained(csv_header_name, "timestamp") || SlamOperation::IsContained(csv_header_name, "time_stamp")) {
+        for (uint32_t i = 0; i < kTimeStampSuffixList.size(); ++i) {
+            if (SlamOperation::IsContained(csv_header_name, kTimeStampSuffixList[i])) {
+                timestamp_scale = kTimeStampScaleList[i];
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 bool BinaryDataLog::CreateLogFileByCsvFile(const std::string &csv_file_name, const std::string &log_file_name) {
     RETURN_FALSE_IF(csv_file_name.empty());
     RETURN_FALSE_IF(log_file_name.empty());
@@ -42,89 +65,8 @@ bool BinaryDataLog::CreateLogFileByCsvFile(const std::string &csv_file_name, con
 
     // Find the index of "time_stamp_s".
     for (uint32_t i = 0; i < csv_header_items.size(); i++) {
-        if (csv_header_items[i] == "timestamp" || csv_header_items[i] == "time_stamp") {
+        if (ParseTimestampInCsvHeader(csv_header_items[i], time_stamp_scale)) {
             time_stamp_index = i;
-            time_stamp_scale = 1e-6;
-            break;
-        }
-        if (csv_header_items[i].find("time_stamp_s") != std::string::npos) {
-            time_stamp_index = i;
-            time_stamp_scale = 1.0;
-            break;
-        }
-        if (csv_header_items[i].find("time_stamp_ns") != std::string::npos) {
-            time_stamp_index = i;
-            time_stamp_scale = 1e-9;
-            break;
-        }
-        if (csv_header_items[i].find("time_stamp_us") != std::string::npos) {
-            time_stamp_index = i;
-            time_stamp_scale = 1e-6;
-            break;
-        }
-        if (csv_header_items[i].find("time_stamp_ms") != std::string::npos) {
-            time_stamp_index = i;
-            time_stamp_scale = 1e-3;
-            break;
-        }
-        if (csv_header_items[i].find("timestamp[s]") != std::string::npos) {
-            time_stamp_index = i;
-            time_stamp_scale = 1.0;
-            break;
-        }
-        if (csv_header_items[i].find("timestamp[ns]") != std::string::npos) {
-            time_stamp_index = i;
-            time_stamp_scale = 1e-9;
-            break;
-        }
-        if (csv_header_items[i].find("timestamp[us]") != std::string::npos) {
-            time_stamp_index = i;
-            time_stamp_scale = 1e-6;
-            break;
-        }
-        if (csv_header_items[i].find("timestamp[ms]") != std::string::npos) {
-            time_stamp_index = i;
-            time_stamp_scale = 1e-3;
-            break;
-        }
-        if (csv_header_items[i].find("timestamp") != std::string::npos && csv_header_items[i].find("_s") != std::string::npos) {
-            time_stamp_index = i;
-            time_stamp_scale = 1.0;
-            break;
-        }
-        if (csv_header_items[i].find("timestamp") != std::string::npos && csv_header_items[i].find("_ns") != std::string::npos) {
-            time_stamp_index = i;
-            time_stamp_scale = 1e-9;
-            break;
-        }
-        if (csv_header_items[i].find("timestamp") != std::string::npos && csv_header_items[i].find("_us") != std::string::npos) {
-            time_stamp_index = i;
-            time_stamp_scale = 1e-6;
-            break;
-        }
-        if (csv_header_items[i].find("timestamp") != std::string::npos && csv_header_items[i].find("_ms") != std::string::npos) {
-            time_stamp_index = i;
-            time_stamp_scale = 1e-3;
-            break;
-        }
-        if (csv_header_items[i].find("time_stamp") != std::string::npos && csv_header_items[i].find("_s") != std::string::npos) {
-            time_stamp_index = i;
-            time_stamp_scale = 1.0;
-            break;
-        }
-        if (csv_header_items[i].find("time_stamp") != std::string::npos && csv_header_items[i].find("_ns") != std::string::npos) {
-            time_stamp_index = i;
-            time_stamp_scale = 1e-9;
-            break;
-        }
-        if (csv_header_items[i].find("time_stamp") != std::string::npos && csv_header_items[i].find("_us") != std::string::npos) {
-            time_stamp_index = i;
-            time_stamp_scale = 1e-6;
-            break;
-        }
-        if (csv_header_items[i].find("time_stamp") != std::string::npos && csv_header_items[i].find("_ms") != std::string::npos) {
-            time_stamp_index = i;
-            time_stamp_scale = 1e-3;
             break;
         }
     }
@@ -160,16 +102,24 @@ bool BinaryDataLog::CreateLogFileByCsvFile(const std::string &csv_file_name, con
     }
 
     // Register packages to log recorder.
+    std::vector<std::string> items_name_in_one_package;
     for (const auto &package: csv_header_items_map) {
-        std::unique_ptr<PackageInfo> package_ptr = std::make_unique<PackageInfo>();
         const auto &items = package.second;
+        items_name_in_one_package.clear();
+        for (const auto &item: items) {
+            items_name_in_one_package.emplace_back(item.first);
+        }
+
+        std::unique_ptr<PackageInfo> package_ptr = std::make_unique<PackageInfo>();
         package_ptr->id = items.begin()->second;
         package_ptr->name = package.first;
+
         for (int32_t i = 0; i < static_cast<int32_t>(items.size()); i++) {
+            using namespace slam_utility;
             if (i < static_cast<int32_t>(items.size()) - 6) {
-                if (items[i].first.back() == 'x' && items[i + 1].first.back() == 'y' && items[i + 2].first.back() == 'z' && items[i + 3].first.back() == 'w' &&
-                    items[i + 4].first.back() == 'x' && items[i + 5].first.back() == 'y' && items[i + 6].first.back() == 'z') {
-                    CONTINUE_IF(items[i].first.front() != 'p' || items[i + 3].first.front() != 'q');
+                if (SlamOperation::IsEndWith(items_name_in_one_package, i, std::vector<std::string> {"x", "y", "z", "w", "x", "y", "z"})) {
+                    CONTINUE_IF(SlamOperation::IsContained(items_name_in_one_package, i, "p_"));
+                    CONTINUE_IF(SlamOperation::IsContained(items_name_in_one_package, i + 3, "q_"));
                     std::string quat_item_name = items[i].first;
                     if (quat_item_name.size() <= 2) {
                         quat_item_name = "Transform";
@@ -186,7 +136,7 @@ bool BinaryDataLog::CreateLogFileByCsvFile(const std::string &csv_file_name, con
                 }
             }
             if (i < static_cast<int32_t>(items.size()) - 2) {
-                if (items[i].first.back() == 'x' && items[i + 1].first.back() == 'y' && items[i + 2].first.back() == 'z') {
+                if (SlamOperation::IsEndWith(items_name_in_one_package, i, std::vector<std::string> {"x", "y", "z"})) {
                     std::string vector3_item_name = items[i].first;
                     if (vector3_item_name.size() <= 2) {
                         vector3_item_name = "vector3";

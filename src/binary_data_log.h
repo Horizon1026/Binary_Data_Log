@@ -97,6 +97,9 @@ private:
     bool LoadOnePackageWithDynamicSize(PackageInfo &package_info, uint8_t &sum_check_byte, PackageDataPerTick &timestamped_data, uint16_t package_id,
                                        bool load_full_data);
 
+    // Support for csv loader.
+    static bool ParseTimestampInCsvHeader(const std::string &csv_header_name, double &timestamp_scale);
+
 private:
     // Support for decodec.
     std::unique_ptr<std::ifstream> file_r_ptr_ = nullptr;
