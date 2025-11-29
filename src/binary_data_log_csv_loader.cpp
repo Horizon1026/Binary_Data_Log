@@ -14,7 +14,7 @@ namespace slam_data_log {
 namespace {
     std::vector<std::string> kTimeStampSuffixList = {"_s", "_ns", "_us", "_ms", "[s]", "[ns]", "[us]", "[ms]"};
     std::vector<double> kTimeStampScaleList = {1.0, 1e-9, 1e-6, 1e-3, 1.0, 1e-9, 1e-6, 1e-3};
-}
+}  // namespace
 
 bool BinaryDataLog::ParseTimestampInCsvHeader(const std::string &csv_header_name, double &timestamp_scale) {
     if (csv_header_name == "timestamp" || csv_header_name == "time_stamp") {
@@ -59,6 +59,8 @@ bool BinaryDataLog::CreateLogFileByCsvFile(const std::string &csv_file_name, con
     std::istringstream csv_header_stream(csv_header);
     while (std::getline(csv_header_stream, temp_str, ',')) {
         temp_str.erase(std::remove(temp_str.begin(), temp_str.end(), ' '), temp_str.end());
+        temp_str.erase(std::remove(temp_str.begin(), temp_str.end(), '\r'), temp_str.end());
+        temp_str.erase(std::remove(temp_str.begin(), temp_str.end(), '\n'), temp_str.end());
         CONTINUE_IF(temp_str.empty());
         csv_header_items.emplace_back(temp_str);
     }
@@ -118,17 +120,17 @@ bool BinaryDataLog::CreateLogFileByCsvFile(const std::string &csv_file_name, con
             using namespace slam_utility;
             if (i < static_cast<int32_t>(items.size()) - 6) {
                 if (SlamOperation::IsEndWith(items_name_in_one_package, i, std::vector<std::string> {"x", "y", "z", "w", "x", "y", "z"})) {
-                    CONTINUE_IF(SlamOperation::IsContained(items_name_in_one_package, i, "p_"));
-                    CONTINUE_IF(SlamOperation::IsContained(items_name_in_one_package, i + 3, "q_"));
+                    CONTINUE_IF(!SlamOperation::IsContained(items_name_in_one_package, i, std::vector<std::string> {"p_"}));
+                    CONTINUE_IF(!SlamOperation::IsContained(items_name_in_one_package, i + 3, std::vector<std::string> {"q_"}));
                     std::string quat_item_name = items[i].first;
                     if (quat_item_name.size() <= 2) {
                         quat_item_name = "Transform";
                     } else if (quat_item_name[quat_item_name.size() - 2] == '_') {
                         quat_item_name = quat_item_name.substr(0, quat_item_name.size() - 2);
-                        quat_item_name[0] = 'T';
+                        quat_item_name = SlamOperation::ReplaceBy(quat_item_name, "p_", "T_");
                     } else {
                         quat_item_name = quat_item_name.substr(0, quat_item_name.size() - 1);
-                        quat_item_name[0] = 'T';
+                        quat_item_name = SlamOperation::ReplaceBy(quat_item_name, "p_", "T_");
                     }
                     package_ptr->items.emplace_back(PackageItemInfo {.type = ItemType::kPose6Dof, .name = quat_item_name});
                     i += 6;
