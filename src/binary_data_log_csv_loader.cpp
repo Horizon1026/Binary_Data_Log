@@ -168,6 +168,9 @@ bool BinaryDataLog::CreateLogFileByCsvFile(const std::string &csv_file_name, con
     std::string csv_line;
     std::vector<double> double_values;
     std::vector<float> float_values;
+    std::vector<float> package_float_values;
+    double time_stamp_offset_s = 0.0;
+    bool is_time_stamp_offset_valid = false;
     while (std::getline(csv_file_stream, csv_line) && !csv_line.empty()) {
         std::istringstream csv_line_stream(csv_line);
         std::string temp_str;
@@ -178,7 +181,10 @@ bool BinaryDataLog::CreateLogFileByCsvFile(const std::string &csv_file_name, con
             double_values.emplace_back(std::stod(temp_str));
         }
         CONTINUE_IF(double_values.size() != csv_header_items.size());
-        static double time_stamp_offset_s = double_values[time_stamp_index];
+        if (!is_time_stamp_offset_valid) {
+            time_stamp_offset_s = double_values[time_stamp_index];
+            is_time_stamp_offset_valid = true;
+        }
 
         float_values.clear();
         for (const auto &value: double_values) {
@@ -187,9 +193,12 @@ bool BinaryDataLog::CreateLogFileByCsvFile(const std::string &csv_file_name, con
 
         for (const auto &package: csv_header_items_map) {
             const uint16_t package_id = package.second.begin()->second;
-            uint8_t *data_ptr = reinterpret_cast<uint8_t *>(&float_values[package_id]);
+            package_float_values.clear();
+            for (const auto &item : package.second) {
+                package_float_values.emplace_back(float_values[item.second]);
+            }
             const float time_stamp_s = static_cast<float>((double_values[time_stamp_index] - time_stamp_offset_s) * time_stamp_scale);
-            log_recorder.RecordPackage(package_id, reinterpret_cast<const char *>(data_ptr), time_stamp_s);
+            log_recorder.RecordPackage(package_id, reinterpret_cast<const char *>(package_float_values.data()), time_stamp_s);
             log_recorder.current_recorded_time_stamp_s() = time_stamp_s;
         }
     }
