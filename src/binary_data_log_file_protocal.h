@@ -85,6 +85,17 @@ for each point cloud package:
     [26] - [29]: Point i + 1 position x.
     ...
 
+for each line cloud package:
+    [10] - [13]: Number of lines in cloud.
+    [14] - [17]: Line i point 1 position x.
+    [18] - [21]: Line i point 1 position y.
+    [22] - [25]: Line i point 1 position z.
+    [26] - [29]: Line i point 2 position x.
+    [30] - [33]: Line i point 2 position y.
+    [34] - [37]: Line i point 2 position z.
+    [38] - [41]: Line i + 1 point 1 position x.
+    ...
+
 */
 
 using namespace slam_utility;
@@ -108,6 +119,7 @@ enum class ItemType : uint8_t {
     kPngImage = 13,
     kMatrix = 14,
     kPointCloud = 15,
+    kLineCloud = 16,
 };
 
 static std::vector<uint32_t> item_type_sizes = {
@@ -127,11 +139,13 @@ static std::vector<uint32_t> item_type_sizes = {
     0,   // kPngImage.
     0,   // kMatrix.
     0,   // kPointCloud.
+    0,   // kLineCloud.
 };
 
 static std::vector<std::string> item_type_strings = {
     "kUint8", "kInt8",   "kUint16",  "kInt16",    "kUint32", "kInt32",    "kUint64", "kInt64",
     "kFloat", "kDouble", "kVector3", "kPose6Dof", "kImage",  "kPngImage", "kMatrix", "kPointCloud",
+    "kLineCloud",
 };
 
 enum class DecodeType : uint8_t {

@@ -175,6 +175,18 @@ void RegisterAllPackages(BinaryDataLog &logger) {
             ReportError("Test failed: register a new package.");
         }
     }
+    {
+        std::unique_ptr<PackageInfo> package_ptr = std::make_unique<PackageInfo>();
+        package_ptr->id = 9;
+        package_ptr->name = "line cloud";
+        package_ptr->items.emplace_back(PackageItemInfo {.type = ItemType::kLineCloud, .name = "line cloud"});
+
+        if (logger.RegisterPackage(package_ptr)) {
+            ReportInfo("Register a new package.");
+        } else {
+            ReportError("Test failed: register a new package.");
+        }
+    }
 }
 
 void TestCreateLog(const std::string &log_file_name) {
@@ -277,6 +289,17 @@ void TestCreateLog(const std::string &log_file_name) {
                 points.emplace_back(Vec3(std::sin(temp_j + 0.15f * i), std::cos(temp_j + 0.1f * i + 0.2f), std::sin(temp_j + 0.3f * i)));
             }
             logger.RecordPackage(8, points, timestamp);
+        }
+
+        if (i % 25 == 0) {
+            std::vector<std::pair<Vec3, Vec3>> lines;
+            for (uint32_t j = 0; j < 10; ++j) {
+                const float temp_j = static_cast<float>(j) / 5.0f;
+                Vec3 p1(std::sin(temp_j + 0.2f * i), std::cos(temp_j + 0.15f * i + 0.3f), std::sin(temp_j + 0.4f * i));
+                Vec3 p2 = p1 + Vec3(0.2f, 0.3f, 0.4f);
+                lines.emplace_back(std::make_pair(p1, p2));
+            }
+            logger.RecordPackage(9, lines, timestamp);
         }
 
         usleep(10000);

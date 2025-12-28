@@ -283,6 +283,14 @@ bool BinaryDataLog::LoadOnePackageWithDynamicSize(PackageInfo &package_info, uin
             break;
         }
 
+        case ItemType::kLineCloud: {
+            uint32_t num_of_lines = 0;
+            file_r_ptr_->read(reinterpret_cast<char *>(&num_of_lines), 4);
+            data_size = 4 + num_of_lines * 2 * 3 * sizeof(float);
+            file_r_ptr_->seekg(-4, std::ios::cur);
+            break;
+        }
+
         default:
             return false;
     }

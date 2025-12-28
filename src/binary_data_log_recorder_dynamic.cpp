@@ -225,4 +225,55 @@ bool BinaryDataLog::RecordPackage(const uint16_t package_id, const std::vector<V
     return true;
 }
 
+bool BinaryDataLog::RecordPackage(const uint16_t package_id, const std::vector<std::pair<Vec3, Vec3>> &line_cloud) {
+    return RecordPackage(package_id, line_cloud, GetSystemTimestamp());
+}
+
+bool BinaryDataLog::RecordPackage(const uint16_t package_id, const std::vector<std::pair<Vec3, Vec3>> &line_cloud, const float time_stamp_s) {
+    RETURN_FALSE_IF(line_cloud.empty());
+
+    const auto it = packages_id_with_objects_.find(package_id);
+    if (it == packages_id_with_objects_.end()) {
+        ReportError("[DataLog] Package id " << package_id << " is not registered.");
+        return false;
+    }
+
+    const uint32_t num_of_lines = static_cast<uint32_t>(line_cloud.size());
+    const uint32_t line_cloud_data_size = 4 + num_of_lines * 2 * 3 * sizeof(float);
+
+    // Write the offset to the next package data.
+    const uint32_t offset = 4 + 2 + 4 + line_cloud_data_size + 1;
+    file_w_ptr_->write(reinterpret_cast<const char *>(&offset), 4);
+    uint8_t sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&offset), 4, 0);
+    // Write the package id.
+    file_w_ptr_->write(reinterpret_cast<const char *>(&it->first), 2);
+    sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&it->first), 2, sum_check_byte);
+    // Write the system timestamp.
+    const float timestamp = time_stamp_s;
+    file_w_ptr_->write(reinterpret_cast<const char *>(&timestamp), 4);
+    sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&timestamp), 4, sum_check_byte);
+
+    // Write the binary data.
+    // Write the number of lines.
+    file_w_ptr_->write(reinterpret_cast<const char *>(&num_of_lines), 4);
+    sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&num_of_lines), 4, sum_check_byte);
+    // Iterate lines cloud, directly write all data bytes.
+    for (const auto &line : line_cloud) {
+        // Point 1
+        for (uint32_t i = 0; i < 3; ++i) {
+            file_w_ptr_->write(reinterpret_cast<const char *>(&line.first[i]), 4);
+            sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&line.first[i]), 4, sum_check_byte);
+        }
+        // Point 2
+        for (uint32_t i = 0; i < 3; ++i) {
+            file_w_ptr_->write(reinterpret_cast<const char *>(&line.second[i]), 4);
+            sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&line.second[i]), 4, sum_check_byte);
+        }
+    }
+
+    // Write the summary check byte.
+    file_w_ptr_->write(reinterpret_cast<const char *>(&sum_check_byte), 1);
+    return true;
+}
+
 }  // namespace slam_data_log
