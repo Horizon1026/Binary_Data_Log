@@ -150,8 +150,8 @@ static std::vector<std::string> item_type_strings = {
 
 enum class DecodeType : uint8_t {
     kGeneral = 0,
-    kQuaternionToPitch = 1,
-    kQuaternionToRoll = 2,
+    kQuaternionToRoll = 1,
+    kQuaternionToPitch = 2,
     kQuaternionToYaw = 3,
     kVector2dToMod = 4,
     kVector3dToMod = 5,

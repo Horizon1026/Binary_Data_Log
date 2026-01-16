@@ -174,11 +174,11 @@ T BinaryDataLog::ConvertBytes(const uint8_t *bytes, ItemType type, DecodeType de
     constexpr float kRadToDeg = 57.295779579f;
     float value = 0.0f;
     switch (decoder) {
-        case DecodeType::kQuaternionToPitch: {
+        case DecodeType::kQuaternionToRoll: {
             value = std::atan2(2.0f * (p[0] * p[1] + p[2] * p[3]), 1.0f - 2.0f * (p[1] * p[1] + p[2] * p[2])) * kRadToDeg;
             break;
         }
-        case DecodeType::kQuaternionToRoll: {
+        case DecodeType::kQuaternionToPitch: {
             value = std::asin(2.0f * (p[0] * p[2] - p[3] * p[1])) * kRadToDeg;
             break;
         }
