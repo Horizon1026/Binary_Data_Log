@@ -1,3 +1,4 @@
 /[Bb]uild/
-/.vscode/
 /[Oo]utput/
+/.vscode/
+/.cache/
