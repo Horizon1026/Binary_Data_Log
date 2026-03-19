@@ -153,8 +153,10 @@ enum class DecodeType : uint8_t {
     kQuaternionToRoll = 1,
     kQuaternionToPitch = 2,
     kQuaternionToYaw = 3,
-    kVector2dToMod = 4,
-    kVector3dToMod = 5,
+    kQuaternionToTilt = 4,
+    kQuaternionToTorsion = 5,
+    kVector2dToMod = 6,
+    kVector3dToMod = 7,
 };
 
 static std::string binary_log_file_header = "BINARY_DATA_LOG";

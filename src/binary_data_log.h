@@ -171,27 +171,46 @@ T BinaryDataLog::ConvertBytes(const uint8_t *bytes, ItemType type, DecodeType de
         return static_cast<T>(0);
     }
     const float *p = reinterpret_cast<const float *>(bytes);
+    const float &qw = p[0];
+    const float &qx = p[1];
+    const float &qy = p[2];
+    const float &qz = p[3];
+    const float &px = p[0];
+    const float &py = p[1];
+    const float &pz = p[2];
     constexpr float kRadToDeg = 57.295779579f;
     float value = 0.0f;
     switch (decoder) {
         case DecodeType::kQuaternionToRoll: {
-            value = std::atan2(2.0f * (p[0] * p[1] + p[2] * p[3]), 1.0f - 2.0f * (p[1] * p[1] + p[2] * p[2])) * kRadToDeg;
+            value = std::atan2(2.0f * (qw * qx + qy * qz), 1.0f - 2.0f * (qx * qx + qy * qy)) * kRadToDeg;
             break;
         }
         case DecodeType::kQuaternionToPitch: {
-            value = std::asin(2.0f * (p[0] * p[2] - p[3] * p[1])) * kRadToDeg;
+            value = std::asin(2.0f * (qw * qy - qz * qx)) * kRadToDeg;
             break;
         }
         case DecodeType::kQuaternionToYaw: {
-            value = std::atan2(2.0f * (p[0] * p[3] + p[1] * p[2]), 1.0f - 2.0f * (p[2] * p[2] + p[3] * p[3])) * kRadToDeg;
+            value = std::atan2(2.0f * (qw * qz + qx * qy), 1.0f - 2.0f * (qy * qy + qz * qz)) * kRadToDeg;
+            break;
+        }
+        case DecodeType::kQuaternionToTilt: {
+            const float t1 = 2.0f * (qw * qy - qz * qx);
+            const float t2 = 1.0f - 2.0f * (qy * qy + qz * qz);
+            value = std::atan2(2.0f * (qy * qw - qx * qz), std::hypot(t1, t2)) * kRadToDeg;
+            break;
+        }
+        case DecodeType::kQuaternionToTorsion: {
+            const float t1 = 2.0f * (qy * qz + qx * qw);
+            const float t2 = 1.0f - 2.0f * (qx * qx + qy * qy);
+            value = std::atan2(t1, t2) * kRadToDeg;
             break;
         }
         case DecodeType::kVector2dToMod: {
-            value = std::sqrt(p[0] * p[0] + p[1] * p[1]);
+            value = std::sqrt(px * px + py * py);
             break;
         }
         case DecodeType::kVector3dToMod: {
-            value = std::sqrt(p[0] * p[0] + p[1] * p[1] + p[2] * p[2]);
+            value = std::sqrt(px * px + py * py + pz * pz);
             break;
         }
 
