@@ -32,21 +32,21 @@ public:
     bool RegisterPackage(std::unique_ptr<PackageInfo> &new_package);
     bool PrepareForRecording();
     bool RecordPackage(const uint16_t package_id, const char *data_ptr);
-    bool RecordPackage(const uint16_t package_id, const char *data_ptr, const float time_stamp_s);
+    bool RecordPackage(const uint16_t package_id, const char *data_ptr, const double time_stamp_s);
     bool RecordPackage(const uint16_t package_id, const GrayImage &image);
-    bool RecordPackage(const uint16_t package_id, const GrayImage &image, const float time_stamp_s);
+    bool RecordPackage(const uint16_t package_id, const GrayImage &image, const double time_stamp_s);
     bool RecordPackage(const uint16_t package_id, const RgbImage &image);
-    bool RecordPackage(const uint16_t package_id, const RgbImage &image, const float time_stamp_s);
+    bool RecordPackage(const uint16_t package_id, const RgbImage &image, const double time_stamp_s);
     bool RecordPackage(const uint16_t package_id, const std::vector<uint8_t> &data_bytes, const ItemType type);
-    bool RecordPackage(const uint16_t package_id, const std::vector<uint8_t> &data_bytes, const ItemType type, const float time_stamp_s);
+    bool RecordPackage(const uint16_t package_id, const std::vector<uint8_t> &data_bytes, const ItemType type, const double time_stamp_s);
     bool RecordPackage(const uint16_t package_id, const Mat &matrix);
-    bool RecordPackage(const uint16_t package_id, const Mat &matrix, const float time_stamp_s);
+    bool RecordPackage(const uint16_t package_id, const Mat &matrix, const double time_stamp_s);
     bool RecordPackage(const uint16_t package_id, const std::vector<Vec3> &points_cloud);
-    bool RecordPackage(const uint16_t package_id, const std::vector<Vec3> &points_cloud, const float time_stamp_s);
+    bool RecordPackage(const uint16_t package_id, const std::vector<Vec3> &points_cloud, const double time_stamp_s);
     bool RecordPackage(const uint16_t package_id, const std::vector<Vec3> &points_cloud, const int32_t step);
-    bool RecordPackage(const uint16_t package_id, const std::vector<Vec3> &points_cloud, const int32_t step, const float time_stamp_s);
+    bool RecordPackage(const uint16_t package_id, const std::vector<Vec3> &points_cloud, const int32_t step, const double time_stamp_s);
     bool RecordPackage(const uint16_t package_id, const std::vector<std::pair<Vec3, Vec3>> &line_cloud);
-    bool RecordPackage(const uint16_t package_id, const std::vector<std::pair<Vec3, Vec3>> &line_cloud, const float time_stamp_s);
+    bool RecordPackage(const uint16_t package_id, const std::vector<std::pair<Vec3, Vec3>> &line_cloud, const double time_stamp_s);
 
     // Support for decoder.
     bool LoadLogFile(const std::string &log_file_name, bool load_dynamic_package_full_data = false);
@@ -64,17 +64,17 @@ public:
     void ReportAllLoadedPackages();
 
     // Reference for member variables.
-    float &current_recorded_time_stamp_s() { return current_recorded_time_stamp_s_; }
+    double &current_recorded_time_stamp_s() { return current_recorded_time_stamp_s_; }
 
     // Const Reference for member variables.
     // Support for decodec.
     const std::unique_ptr<std::ifstream> &file_r_ptr() const { return file_r_ptr_; }
     const std::map<uint16_t, std::unique_ptr<PackageInfo>> &packages_id_with_objects() const { return packages_id_with_objects_; }
-    const std::pair<float, float> &timestamp_s_range_of_loaded_log() const { return timestamp_s_range_of_loaded_log_; }
+    const std::pair<double, double> &timestamp_s_range_of_loaded_log() const { return timestamp_s_range_of_loaded_log_; }
     // Support for recorder.
     const std::unique_ptr<std::fstream> &file_w_ptr() const { return file_w_ptr_; }
     const std::chrono::time_point<std::chrono::system_clock> &start_system_time() const { return start_system_time_; }
-    const float &current_recorded_time_stamp_s() const { return current_recorded_time_stamp_s_; }
+    const double &current_recorded_time_stamp_s() const { return current_recorded_time_stamp_s_; }
     // Support for decoder.
     const std::unordered_map<uint16_t, std::vector<PackageDataPerTick>> &packages_id_with_data() const { return packages_id_with_data_; }
 
@@ -86,9 +86,9 @@ private:
     // Support for recorder.
     void WriteLogFileHeader();
     bool RecordAllRegisteredPackagesAsFileHead();
-    float GetSystemTimestamp();
+    double GetSystemTimestamp();
     bool RecordImage(const uint16_t package_id, const int32_t channels, const int32_t image_rows, const int32_t image_cols, const uint8_t *data_ptr,
-                     const float time_stamp_s);
+                     const double time_stamp_s);
 
     // Support for decoder.
     bool CheckLogFileHeader();
@@ -106,12 +106,12 @@ private:
     // Support for decodec.
     std::unique_ptr<std::ifstream> file_r_ptr_ = nullptr;
     std::map<uint16_t, std::unique_ptr<PackageInfo>> packages_id_with_objects_;
-    std::pair<float, float> timestamp_s_range_of_loaded_log_ = std::make_pair(0, 0);
+    std::pair<double, double> timestamp_s_range_of_loaded_log_ = std::make_pair(0, 0);
 
     // Support for recorder.
     std::unique_ptr<std::fstream> file_w_ptr_ = nullptr;
     std::chrono::time_point<std::chrono::system_clock> start_system_time_ = std::chrono::system_clock::now();
-    float current_recorded_time_stamp_s_ = 0.0f;
+    double current_recorded_time_stamp_s_ = 0.0f;
 
     // Support for decoder.
     std::unordered_map<uint16_t, std::vector<PackageDataPerTick>> packages_id_with_data_;

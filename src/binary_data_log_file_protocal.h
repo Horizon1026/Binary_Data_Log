@@ -42,58 +42,56 @@ for each package:
         which means the length of this 'package_content',
         and including the checking byte.
     [4] - [5]: Package id.
-    [6] - [9]: System timestamp of this package content. Unit is millisecond.
-
-    [10] - [n]: Binary data.(This is the only different part of different packages)
-
+    [6] - [13]: System timestamp of this package content. Unit is second. Type is double.
+    [14] - [n]: Binary data.(This is the only different part of different packages)
     [n + 1]: Sum check byte of this package.
 
 for each vecor3 package:
-    [10] - [13]: Vector in X axis.
-    [14] - [17]: Vector in Y axis.
-    [18] - [21]: Vector in Z axis.
+    [14] - [17]: Vector in X axis.
+    [18] - [21]: Vector in Y axis.
+    [22] - [25]: Vector in Z axis.
 
 for each pose 6dof package:
-    [10] - [13]: Position in X axis.
-    [14] - [17]: Position in Y axis.
-    [18] - [21]: Position in Z axis.
-    [22] - [25]: Rotation in quaternion w.
-    [26] - [29]: Rotation in quaternion x.
-    [30] - [33]: Rotation in quaternion y.
-    [34] - [37]: Rotation in quaternion z.
+    [14] - [17]: Position in X axis.
+    [18] - [21]: Position in Y axis.
+    [22] - [25]: Position in Z axis.
+    [26] - [29]: Rotation in quaternion w.
+    [30] - [33]: Rotation in quaternion x.
+    [34] - [37]: Rotation in quaternion y.
+    [38] - [41]: Rotation in quaternion z.
 
 for each image package:
-    [10]: Channels.
-    [11] - [12]: Image rows(height).
-    [13] - [14]: Image cols(width).
-    [15] - [n]: Binary data.
+    [14]: Channels.
+    [15] - [16]: Image rows(height).
+    [17] - [18]: Image cols(width).
+    [19] - [n]: Binary data.
 
 for each PNG image package:
-    [10] - [13]: Number of bytes in png file.
-    [14] - [n]: Binary data of png file.
+    [14] - [17]: Number of bytes in png file.
+    [18] - [n]: Binary data of png file.
 
 for each matrix package:
-    [10] - [11]: Matrix rows.
-    [12] - [13]: Matrix cols.
-    [14] - [n]: Binary data (standard float encode, row major).
+    [14] - [15]: Matrix rows.
+    [16] - [17]: Matrix cols.
+    [18] - [n]: Binary data (standard float encode, row major).
 
 for each point cloud package:
-    [10] - [13]: Number of points in cloud.
-    [14] - [17]: Point i position x.
-    [18] - [21]: Point i position y.
-    [22] - [25]: Point i position z.
-    [26] - [29]: Point i + 1 position x.
+    [14] - [17]: Number of points in cloud.
+    [18] - [21]: Point i position x.
+    [22] - [25]: Point i position y.
+    [26] - [29]: Point i position z.
+    [30] - [33]: Point i + 1 position x.
     ...
 
 for each line cloud package:
-    [10] - [13]: Number of lines in cloud.
-    [14] - [17]: Line i point 1 position x.
-    [18] - [21]: Line i point 1 position y.
-    [22] - [25]: Line i point 1 position z.
-    [26] - [29]: Line i point 2 position x.
-    [30] - [33]: Line i point 2 position y.
-    [34] - [37]: Line i point 2 position z.
-    [38] - [41]: Line i + 1 point 1 position x.
+    [14] - [17]: Number of lines in cloud.
+    [18] - [21]: Line i point 1 position x.
+    [22] - [25]: Line i point 1 position y.
+    [26] - [29]: Line i point 1 position z.
+    [30] - [33]: Line i point 2 position x.
+    [34] - [37]: Line i point 2 position y.
+    [38] - [41]: Line i point 2 position z.
+    [42] - [45]: Line i + 1 point 1 position x.
     ...
 
 */
@@ -177,7 +175,7 @@ struct PackageInfo {
 };
 
 struct PackageDataPerTick {
-    float timestamp_s = 0.0f;
+    double timestamp_s = 0.0f;
     std::vector<uint8_t> data;         // Binary data stored in bytes.
     uint64_t index_in_file = 0;        // Start at 'offset'.
     uint32_t size_of_all_in_file = 0;  // Including offset, id, timestamp, binary_data, check_byte.

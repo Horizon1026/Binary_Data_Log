@@ -37,7 +37,7 @@ bool BinaryDataLog::LoadLogFile(const std::string &log_file_name, bool load_dyna
     // Load all registered packages information.
     RETURN_FALSE_IF_FALSE(LoadRegisteredPackagesFromFileHead());
     // Load all data.
-    timestamp_s_range_of_loaded_log_ = std::make_pair(INFINITY, -INFINITY);
+    timestamp_s_range_of_loaded_log_ = std::make_pair(std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity());
     while (!file_r_ptr_->eof()) {
         // Break only when it is end or out of file.
         const uint64_t index_in_file_now = file_r_ptr_->tellg();
@@ -175,9 +175,9 @@ bool BinaryDataLog::LoadOnePackage(bool load_dynamic_package_full_data) {
         return false;
     }
 
-    // Load system timestamp.
-    file_r_ptr_->read(reinterpret_cast<char *>(&timestamped_data.timestamp_s), 4);
-    sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&timestamped_data.timestamp_s), 4, sum_check_byte);
+    // Load system timestamp. Type double. Unit second.
+    file_r_ptr_->read(reinterpret_cast<char *>(&timestamped_data.timestamp_s), 8);
+    sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&timestamped_data.timestamp_s), 8, sum_check_byte);
     // Update timestamp range.
     timestamp_s_range_of_loaded_log_.first = std::min(timestamp_s_range_of_loaded_log_.first, timestamped_data.timestamp_s);
     timestamp_s_range_of_loaded_log_.second = std::max(timestamp_s_range_of_loaded_log_.second, timestamped_data.timestamp_s);

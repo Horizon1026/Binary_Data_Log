@@ -6,7 +6,7 @@
 
 namespace slam_data_log {
 
-bool BinaryDataLog::RecordPackage(const uint16_t package_id, const GrayImage &image, const float time_stamp_s) {
+bool BinaryDataLog::RecordPackage(const uint16_t package_id, const GrayImage &image, const double time_stamp_s) {
     return RecordImage(package_id, 1, image.rows(), image.cols(), image.data(), time_stamp_s);
 }
 
@@ -14,7 +14,7 @@ bool BinaryDataLog::RecordPackage(const uint16_t package_id, const GrayImage &im
     return RecordImage(package_id, 1, image.rows(), image.cols(), image.data(), GetSystemTimestamp());
 }
 
-bool BinaryDataLog::RecordPackage(const uint16_t package_id, const RgbImage &image, const float time_stamp_s) {
+bool BinaryDataLog::RecordPackage(const uint16_t package_id, const RgbImage &image, const double time_stamp_s) {
     return RecordImage(package_id, 3, image.rows(), image.cols(), image.data(), time_stamp_s);
 }
 
@@ -23,7 +23,7 @@ bool BinaryDataLog::RecordPackage(const uint16_t package_id, const RgbImage &ima
 }
 
 bool BinaryDataLog::RecordImage(const uint16_t package_id, const int32_t channels, const int32_t image_rows, const int32_t image_cols, const uint8_t *data_ptr,
-                                const float time_stamp_s) {
+                                const double time_stamp_s) {
     RETURN_FALSE_IF(file_w_ptr_ == nullptr);
     RETURN_FALSE_IF(data_ptr == nullptr);
 
@@ -40,16 +40,16 @@ bool BinaryDataLog::RecordImage(const uint16_t package_id, const int32_t channel
 
     // Write the offset to the next package data.
     // offset, package_id, timestamp, binary_data, check_byte.
-    const uint32_t offset = 4 + 2 + 4 + image_data_size + 1;
+    const uint32_t offset = 4 + 2 + 8 + image_data_size + 1;
     file_w_ptr_->write(reinterpret_cast<const char *>(&offset), 4);
     uint8_t sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&offset), 4, 0);
     // Write the package id.
     file_w_ptr_->write(reinterpret_cast<const char *>(&it->first), 2);
     sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&it->first), 2, sum_check_byte);
     // Write the system timestamp.
-    const float timestamp = time_stamp_s;
-    file_w_ptr_->write(reinterpret_cast<const char *>(&timestamp), 4);
-    sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&timestamp), 4, sum_check_byte);
+    const double timestamp = time_stamp_s;
+    file_w_ptr_->write(reinterpret_cast<const char *>(&timestamp), 8);
+    sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&timestamp), 8, sum_check_byte);
 
     // Write the binary data.
     // Write image channels.
@@ -75,7 +75,7 @@ bool BinaryDataLog::RecordImage(const uint16_t package_id, const int32_t channel
 
 bool BinaryDataLog::RecordPackage(const uint16_t package_id, const Mat &matrix) { return RecordPackage(package_id, matrix, GetSystemTimestamp()); }
 
-bool BinaryDataLog::RecordPackage(const uint16_t package_id, const Mat &matrix, const float time_stamp_s) {
+bool BinaryDataLog::RecordPackage(const uint16_t package_id, const Mat &matrix, const double time_stamp_s) {
     RETURN_FALSE_IF(file_w_ptr_ == nullptr);
     RETURN_FALSE_IF(matrix.rows() < 1 || matrix.cols() < 1);
 
@@ -92,16 +92,16 @@ bool BinaryDataLog::RecordPackage(const uint16_t package_id, const Mat &matrix, 
 
     // Write the offset to the next package data.
     // offset, package_id, timestamp, binary_data, check_byte.
-    const uint32_t offset = 4 + 2 + 4 + matrix_data_size + 1;
+    const uint32_t offset = 4 + 2 + 8 + matrix_data_size + 1;
     file_w_ptr_->write(reinterpret_cast<const char *>(&offset), 4);
     uint8_t sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&offset), 4, 0);
     // Write the package id.
     file_w_ptr_->write(reinterpret_cast<const char *>(&it->first), 2);
     sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&it->first), 2, sum_check_byte);
     // Write the system timestamp.
-    const float timestamp = time_stamp_s;
-    file_w_ptr_->write(reinterpret_cast<const char *>(&timestamp), 4);
-    sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&timestamp), 4, sum_check_byte);
+    const double timestamp = time_stamp_s;
+    file_w_ptr_->write(reinterpret_cast<const char *>(&timestamp), 8);
+    sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&timestamp), 8, sum_check_byte);
 
     // Write the binary data.
     // Write matrix rows/height.
@@ -126,7 +126,7 @@ bool BinaryDataLog::RecordPackage(const uint16_t package_id, const std::vector<u
     return RecordPackage(package_id, data_bytes, type, GetSystemTimestamp());
 }
 
-bool BinaryDataLog::RecordPackage(const uint16_t package_id, const std::vector<uint8_t> &data_bytes, const ItemType type, const float time_stamp_s) {
+bool BinaryDataLog::RecordPackage(const uint16_t package_id, const std::vector<uint8_t> &data_bytes, const ItemType type, const double time_stamp_s) {
     RETURN_FALSE_IF(data_bytes.empty());
 
     const auto it = packages_id_with_objects_.find(package_id);
@@ -144,16 +144,16 @@ bool BinaryDataLog::RecordPackage(const uint16_t package_id, const std::vector<u
 
     // Write the offset to the next package data.
     // offset, package_id, timestamp, binary_data, check_byte.
-    const uint32_t offset = 4 + 2 + 4 + png_image_data_size + 1;
+    const uint32_t offset = 4 + 2 + 8 + png_image_data_size + 1;
     file_w_ptr_->write(reinterpret_cast<const char *>(&offset), 4);
     uint8_t sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&offset), 4, 0);
     // Write the package id.
     file_w_ptr_->write(reinterpret_cast<const char *>(&it->first), 2);
     sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&it->first), 2, sum_check_byte);
     // Write the system timestamp.
-    const float timestamp = time_stamp_s;
-    file_w_ptr_->write(reinterpret_cast<const char *>(&timestamp), 4);
-    sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&timestamp), 4, sum_check_byte);
+    const double timestamp = time_stamp_s;
+    file_w_ptr_->write(reinterpret_cast<const char *>(&timestamp), 8);
+    sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&timestamp), 8, sum_check_byte);
 
     // Write the binary data.
     // Write the number of date bytes.
@@ -170,7 +170,7 @@ bool BinaryDataLog::RecordPackage(const uint16_t package_id, const std::vector<u
 
 bool BinaryDataLog::RecordPackage(const uint16_t package_id, const std::vector<Vec3> &points_cloud) { return RecordPackage(package_id, points_cloud, 1); }
 
-bool BinaryDataLog::RecordPackage(const uint16_t package_id, const std::vector<Vec3> &points_cloud, const float time_stamp_s) {
+bool BinaryDataLog::RecordPackage(const uint16_t package_id, const std::vector<Vec3> &points_cloud, const double time_stamp_s) {
     return RecordPackage(package_id, points_cloud, 1, time_stamp_s);
 }
 
@@ -178,7 +178,7 @@ bool BinaryDataLog::RecordPackage(const uint16_t package_id, const std::vector<V
     return RecordPackage(package_id, points_cloud, GetSystemTimestamp(), step);
 }
 
-bool BinaryDataLog::RecordPackage(const uint16_t package_id, const std::vector<Vec3> &points_cloud, const int32_t step, const float time_stamp_s) {
+bool BinaryDataLog::RecordPackage(const uint16_t package_id, const std::vector<Vec3> &points_cloud, const int32_t step, const double time_stamp_s) {
     RETURN_FALSE_IF(points_cloud.empty() || step < 1);
 
     const auto it = packages_id_with_objects_.find(package_id);
@@ -193,16 +193,16 @@ bool BinaryDataLog::RecordPackage(const uint16_t package_id, const std::vector<V
 
     // Write the offset to the next package data.
     // offset, package_id, timestamp, binary_data, check_byte.
-    const uint32_t offset = 4 + 2 + 4 + point_cloud_data_size + 1;
+    const uint32_t offset = 4 + 2 + 8 + point_cloud_data_size + 1;
     file_w_ptr_->write(reinterpret_cast<const char *>(&offset), 4);
     uint8_t sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&offset), 4, 0);
     // Write the package id.
     file_w_ptr_->write(reinterpret_cast<const char *>(&it->first), 2);
     sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&it->first), 2, sum_check_byte);
     // Write the system timestamp.
-    const float timestamp = time_stamp_s;
-    file_w_ptr_->write(reinterpret_cast<const char *>(&timestamp), 4);
-    sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&timestamp), 4, sum_check_byte);
+    const double timestamp = time_stamp_s;
+    file_w_ptr_->write(reinterpret_cast<const char *>(&timestamp), 8);
+    sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&timestamp), 8, sum_check_byte);
 
     // Write the binary data.
     // Write the number of date bytes.
@@ -229,7 +229,7 @@ bool BinaryDataLog::RecordPackage(const uint16_t package_id, const std::vector<s
     return RecordPackage(package_id, line_cloud, GetSystemTimestamp());
 }
 
-bool BinaryDataLog::RecordPackage(const uint16_t package_id, const std::vector<std::pair<Vec3, Vec3>> &line_cloud, const float time_stamp_s) {
+bool BinaryDataLog::RecordPackage(const uint16_t package_id, const std::vector<std::pair<Vec3, Vec3>> &line_cloud, const double time_stamp_s) {
     RETURN_FALSE_IF(line_cloud.empty());
 
     const auto it = packages_id_with_objects_.find(package_id);
@@ -238,20 +238,21 @@ bool BinaryDataLog::RecordPackage(const uint16_t package_id, const std::vector<s
         return false;
     }
 
+    // Check point cloud size.
     const uint32_t num_of_lines = static_cast<uint32_t>(line_cloud.size());
     const uint32_t line_cloud_data_size = 4 + num_of_lines * 2 * 3 * sizeof(float);
 
     // Write the offset to the next package data.
-    const uint32_t offset = 4 + 2 + 4 + line_cloud_data_size + 1;
+    const uint32_t offset = 4 + 2 + 8 + line_cloud_data_size + 1;
     file_w_ptr_->write(reinterpret_cast<const char *>(&offset), 4);
     uint8_t sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&offset), 4, 0);
     // Write the package id.
     file_w_ptr_->write(reinterpret_cast<const char *>(&it->first), 2);
     sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&it->first), 2, sum_check_byte);
     // Write the system timestamp.
-    const float timestamp = time_stamp_s;
-    file_w_ptr_->write(reinterpret_cast<const char *>(&timestamp), 4);
-    sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&timestamp), 4, sum_check_byte);
+    const double timestamp = time_stamp_s;
+    file_w_ptr_->write(reinterpret_cast<const char *>(&timestamp), 8);
+    sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&timestamp), 8, sum_check_byte);
 
     // Write the binary data.
     // Write the number of lines.

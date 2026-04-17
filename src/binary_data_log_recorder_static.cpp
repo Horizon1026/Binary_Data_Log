@@ -79,15 +79,15 @@ bool BinaryDataLog::RecordAllRegisteredPackagesAsFileHead() {
     return true;
 }
 
-float BinaryDataLog::GetSystemTimestamp() {
+double BinaryDataLog::GetSystemTimestamp() {
     std::chrono::time_point<std::chrono::system_clock> new_time_point = std::chrono::system_clock::now();
-    std::chrono::duration<float> elapsed_seconds = new_time_point - start_system_time_;
-    return static_cast<float>(elapsed_seconds.count());
+    std::chrono::duration<double> elapsed_seconds = new_time_point - start_system_time_;
+    return static_cast<double>(elapsed_seconds.count());
 }
 
 bool BinaryDataLog::RecordPackage(const uint16_t package_id, const char *data_ptr) { return RecordPackage(package_id, data_ptr, GetSystemTimestamp()); }
 
-bool BinaryDataLog::RecordPackage(const uint16_t package_id, const char *data_ptr, const float time_stamp_s) {
+bool BinaryDataLog::RecordPackage(const uint16_t package_id, const char *data_ptr, const double time_stamp_s) {
     RETURN_FALSE_IF(file_w_ptr_ == nullptr);
     RETURN_FALSE_IF(data_ptr == nullptr);
 
@@ -99,7 +99,7 @@ bool BinaryDataLog::RecordPackage(const uint16_t package_id, const char *data_pt
 
     // Write the offset to the next package data.
     // offset, package_id, timestamp, binary_data, check_byte.
-    const uint32_t offset = 4 + 2 + 4 + it->second->size + 1;
+    const uint32_t offset = 4 + 2 + 8 + it->second->size + 1;
     file_w_ptr_->write(reinterpret_cast<const char *>(&offset), 4);
     uint8_t sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&offset), 4, 0);
 
@@ -108,9 +108,9 @@ bool BinaryDataLog::RecordPackage(const uint16_t package_id, const char *data_pt
     sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&it->first), 2, sum_check_byte);
 
     // Write the system timestamp.
-    const float timestamp = time_stamp_s;
-    file_w_ptr_->write(reinterpret_cast<const char *>(&timestamp), 4);
-    sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&timestamp), 4, sum_check_byte);
+    const double timestamp = time_stamp_s;
+    file_w_ptr_->write(reinterpret_cast<const char *>(&timestamp), 8);
+    sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&timestamp), 8, sum_check_byte);
 
     // Write the binary data.
     file_w_ptr_->write(data_ptr, it->second->size);

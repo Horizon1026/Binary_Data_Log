@@ -221,7 +221,7 @@ void TestCreateLog(const std::string &log_file_name) {
 
     // Record data.
     for (uint32_t i = 0; i < 200; ++i) {
-        const float timestamp = static_cast<float>(i) * 0.2f;
+        const double timestamp = static_cast<float>(i) * 0.2f;
         const float temp = static_cast<float>(i) / 15.0f;
         ImuData imu_data {
             .gyro_x = -std::sin(temp + 0.34f),
