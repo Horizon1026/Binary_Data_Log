@@ -194,9 +194,10 @@ T BinaryDataLog::ConvertBytes(const uint8_t *bytes, ItemType type, DecodeType de
             break;
         }
         case DecodeType::kQuaternionToTilt: {
-            const float t1 = 2.0f * (qw * qy - qz * qx);
-            const float t2 = 1.0f - 2.0f * (qy * qy + qz * qz);
-            value = std::atan2(2.0f * (qy * qw - qx * qz), std::hypot(t1, t2)) * kRadToDeg;
+            // Total tilt angle of body z-axis from world vertical (gravity direction).
+            const float sin_half = std::sqrt(qx * qx + qy * qy);
+            const float cos_half = std::sqrt(qw * qw + qz * qz);
+            value = 2.0f * std::atan2(sin_half, cos_half) * kRadToDeg;
             break;
         }
         case DecodeType::kQuaternionToTorsion: {
