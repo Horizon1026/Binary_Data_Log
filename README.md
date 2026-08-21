@@ -7,14 +7,17 @@ A general binary data log codec.
 - [x] Binary log decoder.
     - [x] Decode all data.
     - [x] Predecode file index of all data.
+- [x] Binary log csv loader.
 
 # Dependence
 
 ### 项目仓库依赖（源码在 repo 中）
 - Slam_Utility
+- Visualizor2D
 
 ### 第三方仓库依赖
 - Eigen3 (>= 3.3.7)（`sudo apt install libeigen3-dev`）
+- glfw3（`sudo apt install libglfw3-dev`）
 
 # Compile and Run
 - 第三方仓库的话需要自行 apt-get install 安装
