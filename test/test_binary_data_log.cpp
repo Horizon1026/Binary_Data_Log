@@ -1,19 +1,19 @@
 #include "binary_data_log.h"
+
 #include "slam_log_reporter.h"
 #include "slam_operations.h"
 #include "visualizor_2d.h"
+#include "dirent.h"
+#include "unistd.h"
 
 #include "cstring"
-#include "dirent.h"
 #include "iostream"
-#include "unistd.h"
 #include "vector"
 
 using namespace slam_data_log;
 using namespace slam_visualizor;
 
 #include "enable_stack_backward.h"
-
 #pragma pack(1)
 
 struct ImuData {

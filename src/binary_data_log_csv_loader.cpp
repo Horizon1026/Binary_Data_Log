@@ -1,12 +1,13 @@
 #include "binary_data_log.h"
+
 #include "slam_log_reporter.h"
 #include "slam_operations.h"
+#include "dirent.h"
+#include "unistd.h"
 
 #include "cstring"
-#include "dirent.h"
 #include "filesystem"
 #include "iostream"
-#include "unistd.h"
 #include "vector"
 
 namespace slam_data_log {

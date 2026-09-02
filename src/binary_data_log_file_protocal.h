@@ -2,6 +2,7 @@
 #define _BINARY_DATA_LOG_FILE_PROTOCAL_H_
 
 #include "basic_type.h"
+
 #include "string"
 #include "vector"
 

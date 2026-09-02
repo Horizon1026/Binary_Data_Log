@@ -1,4 +1,5 @@
 #include "binary_data_log.h"
+
 #include "slam_log_reporter.h"
 #include "slam_memory.h"
 #include "slam_operations.h"
