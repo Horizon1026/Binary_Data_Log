@@ -8,6 +8,7 @@ A general binary data log codec.
     - [x] Decode all data.
     - [x] Predecode file index of all data.
 - [x] Binary log csv loader.
+- [x] Python implementation of the protocal and the recorder, in /py_src.
 
 # Dependence
 
@@ -32,6 +33,17 @@ make -j
 ```bash
 sh run.sh
 ```
+
+# Python Implementation
+- /py_src 中是基于 python3.10 语法实现的 log 存储功能，只使用 python 标准库，不需要任何第三方依赖。
+- 协议与 C++ 实现完全一致，相同的数据写出的 log 文件逐字节相同，可以直接被 C++ 的 decoder 读取。
+- 与 C++ 实现相比，只包含协议和 recorder，不包含 log 解析和 csv 转换功能。
+- 生成一个示例 log 文件：
+```bash
+python3 py_src/example_record.py data.binlog
+```
+- 使用方法参考 /py_src/example_record.py。
+- Perception_Utility 的训练可视化用这个 recorder 把曲线和预览图写成 binlog 文件，可以用 Binary_Data_Viewer 打开，参考 Perception_Utility/src/visuializor/binlog.py。调用方需将 Binary_Data_Log/py_src 加入 PYTHONPATH；Image_Classification/run.sh 已配置该路径。
 
 # Tips
 - 参考开源的 protobuf 文件格式思想，设计了一种简单的二进制 log 存储协议。欢迎一起交流学习，不同意商用；
