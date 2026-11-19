@@ -2,10 +2,10 @@
 
 #include "slam_log_reporter.h"
 #include "slam_operations.h"
-#include "dirent.h"
-#include "unistd.h"
 
+#include "unistd.h"
 #include "cstring"
+#include "dirent.h"
 #include "filesystem"
 #include "iostream"
 #include "vector"
@@ -189,7 +189,7 @@ bool BinaryDataLog::CreateLogFileByCsvFile(const std::string &csv_file_name, con
         for (const auto &package: csv_header_items_map) {
             const uint16_t package_id = package.second.begin()->second;
             package_float_values.clear();
-            for (const auto &item : package.second) {
+            for (const auto &item: package.second) {
                 package_float_values.emplace_back(float_values[item.second]);
             }
             const double time_stamp_s = double_values[time_stamp_index] * time_stamp_scale;

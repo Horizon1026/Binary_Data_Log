@@ -142,9 +142,8 @@ static std::vector<uint32_t> item_type_sizes = {
 };
 
 static std::vector<std::string> item_type_strings = {
-    "kUint8", "kInt8",   "kUint16",  "kInt16",    "kUint32", "kInt32",    "kUint64", "kInt64",
-    "kFloat", "kDouble", "kVector3", "kPose6Dof", "kImage",  "kPngImage", "kMatrix", "kPointCloud",
-    "kLineCloud",
+    "kUint8",  "kInt8",    "kUint16",   "kInt16", "kUint32",   "kInt32",  "kUint64",     "kInt64",     "kFloat",
+    "kDouble", "kVector3", "kPose6Dof", "kImage", "kPngImage", "kMatrix", "kPointCloud", "kLineCloud",
 };
 
 enum class DecodeType : uint8_t {

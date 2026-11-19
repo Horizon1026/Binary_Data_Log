@@ -3,8 +3,6 @@
 #include "slam_log_reporter.h"
 #include "slam_operations.h"
 
-#include "chrono"
-
 namespace slam_data_log {
 
 bool BinaryDataLog::RecordPackage(const uint16_t package_id, const GrayImage &image, const double time_stamp_s) {
@@ -260,7 +258,7 @@ bool BinaryDataLog::RecordPackage(const uint16_t package_id, const std::vector<s
     file_w_ptr_->write(reinterpret_cast<const char *>(&num_of_lines), 4);
     sum_check_byte = SummaryBytes(reinterpret_cast<const uint8_t *>(&num_of_lines), 4, sum_check_byte);
     // Iterate lines cloud, directly write all data bytes.
-    for (const auto &line : line_cloud) {
+    for (const auto &line: line_cloud) {
         // Point 1
         for (uint32_t i = 0; i < 3; ++i) {
             file_w_ptr_->write(reinterpret_cast<const char *>(&line.first[i]), 4);
